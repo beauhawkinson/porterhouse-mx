@@ -1,13 +1,18 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 
-import { Footer } from "@/components/ui/footer";
+import { Footer } from "@/components/ui/Footer";
 import { Header } from "@/components/ui/header";
 import { app } from "@/lib/config/app.config";
+import { checkIsAdminFn } from "@/lib/server/admin";
 import appCss from "../styles.css?url";
 
 import type { PropsWithChildren } from "react";
 
 export const Route = createRootRoute({
+  beforeLoad: async () => {
+    const isAdmin = await checkIsAdminFn().catch(() => false);
+    return { isAdmin };
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useCartStore } from "@/lib/cart/store";
 import { getOrderBySessionId } from "@/lib/server/checkout";
 

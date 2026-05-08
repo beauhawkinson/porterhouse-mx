@@ -10,6 +10,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().startsWith("sk_"),
     STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_"),
+    ADMIN_EMAILS: z.string().min(1),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

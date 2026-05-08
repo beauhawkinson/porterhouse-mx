@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { ProductCard } from "@/components/products/ProductCard";
 import { Splatter } from "@/components/splatter";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { app } from "@/lib/config/app.config";
 import { getFeaturedProducts } from "@/lib/server/products";
 
