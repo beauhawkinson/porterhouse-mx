@@ -2,6 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 import { getOrderFn, updateFulfillmentFn, updateOrderNotesFn } from "@/lib/server/admin";
 
@@ -45,75 +60,16 @@ function CopyButton({ value }: { value: string }) {
   );
 }
 
-function ShipModal({
-  onConfirm,
-  onCancel,
-  saving,
-}: {
-  onConfirm: (tracking: string, carrier: string) => void;
-  onCancel: () => void;
-  saving: boolean;
-}) {
-  const [tracking, setTracking] = useState("");
-  const [carrier, setCarrier] = useState("usps");
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-sm border border-[#e5e0d8] bg-white p-6 shadow-lg">
-        <h3 className="mb-4 font-heading text-lg tracking-wider text-[#111]">MARK AS SHIPPED</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
-              Carrier
-            </label>
-            <select
-              value={carrier}
-              onChange={(e) => setCarrier(e.target.value)}
-              className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333]"
-            >
-              <option value="usps">USPS</option>
-              <option value="ups">UPS</option>
-              <option value="fedex">FedEx</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
-              Tracking Number
-            </label>
-            <input
-              type="text"
-              value={tracking}
-              onChange={(e) => setTracking(e.target.value)}
-              placeholder="1Z999AA10123456784"
-              className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] placeholder:text-[#bbb]"
-            />
-          </div>
-        </div>
-        <div className="mt-4 flex gap-2">
-          <Button
-            size="sm"
-            disabled={saving}
-            onClick={() => onConfirm(tracking, carrier)}
-          >
-            {saving ? "Saving…" : "Confirm"}
-          </Button>
-          <Button size="sm" variant="secondary" onClick={onCancel}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function OrderDetailPage() {
   const initialOrder = Route.useLoaderData();
   const [order, setOrder] = useState(initialOrder);
   const [showShipModal, setShowShipModal] = useState(false);
+  const [showRevertConfirm, setShowRevertConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [notes, setNotes] = useState(order?.internalNotes ?? "");
   const [notesSaving, setNotesSaving] = useState(false);
+  const [tracking, setTracking] = useState("");
+  const [carrier, setCarrier] = useState("usps");
 
   if (!order) {
     return (
@@ -158,13 +114,83 @@ function OrderDetailPage() {
 
   return (
     <div className="space-y-6">
-      {showShipModal && (
-        <ShipModal
-          saving={saving}
-          onConfirm={(tracking, carrier) => handleFulfillment("shipped", tracking, carrier)}
-          onCancel={() => setShowShipModal(false)}
-        />
-      )}
+      {/* Ship Dialog */}
+      <Dialog open={showShipModal} onOpenChange={(open) => { if (!open) setShowShipModal(false); }}>
+        <DialogContent side="center">
+          <DialogHeader>
+            <DialogTitle>Mark as Shipped</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
+                Carrier
+              </label>
+              <Select value={carrier} onValueChange={setCarrier}>
+                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="usps">USPS</SelectItem>
+                  <SelectItem value="ups">UPS</SelectItem>
+                  <SelectItem value="fedex">FedEx</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
+                Tracking Number
+              </label>
+              <input
+                type="text"
+                value={tracking}
+                onChange={(e) => setTracking(e.target.value)}
+                placeholder="1Z999AA10123456784"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] placeholder:text-[#bbb]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button size="sm" variant="ghost">Cancel</Button>
+            </DialogClose>
+            <Button
+              size="sm"
+              disabled={saving}
+              onClick={() => handleFulfillment("shipped", tracking, carrier)}
+            >
+              {saving ? "Saving…" : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revert Confirm Dialog */}
+      <Dialog open={showRevertConfirm} onOpenChange={setShowRevertConfirm}>
+        <DialogContent side="center">
+          <DialogHeader>
+            <DialogTitle>Revert to Unfulfilled</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[#555]">
+            This will clear the fulfillment and shipping data from the order.
+          </p>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button size="sm" variant="ghost">Cancel</Button>
+            </DialogClose>
+            <Button
+              size="sm"
+              disabled={saving}
+              onClick={() => {
+                setShowRevertConfirm(false);
+                handleFulfillment("unfulfilled");
+              }}
+            >
+              Revert
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {isRefunded && (
         <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -329,7 +355,7 @@ function OrderDetailPage() {
             size="sm"
             variant="ghost"
             disabled={saving || order.fulfillmentStatus === "unfulfilled"}
-            onClick={() => handleFulfillment("unfulfilled")}
+            onClick={() => setShowRevertConfirm(true)}
           >
             Revert to Unfulfilled
           </Button>

@@ -3,6 +3,13 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/Button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getAdminProductFn, updateProductFn, updateVariantStockFn } from "@/lib/server/admin";
 
 const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"] as const;
@@ -163,16 +170,20 @@ function ProductEditPage() {
             </Field>
 
             <Field label="Category" error={errors.category}>
-              <select
+              <Select
                 value={form.category}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, category: e.target.value as "tshirt" | "sweatshirt" }))
+                onValueChange={(value) =>
+                  setForm((p) => ({ ...p, category: value as "tshirt" | "sweatshirt" }))
                 }
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
               >
-                <option value="tshirt">T-Shirt</option>
-                <option value="sweatshirt">Sweatshirt</option>
-              </select>
+                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tshirt">T-Shirt</SelectItem>
+                  <SelectItem value="sweatshirt">Sweatshirt</SelectItem>
+                </SelectContent>
+              </Select>
             </Field>
 
             <div className="flex items-center gap-3">
