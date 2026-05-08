@@ -26,14 +26,14 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/admin/orders/")({
   validateSearch: searchSchema,
   loader: ({ location: { search } }) => {
-    const params = search as z.infer<typeof searchSchema>;
+    const params = searchSchema.parse(search);
     return listOrdersFn({
       data: {
-        paymentStatus: params.paymentStatus ?? "all",
-        fulfillmentStatus: params.fulfillmentStatus ?? "all",
+        paymentStatus: params.paymentStatus,
+        fulfillmentStatus: params.fulfillmentStatus,
         searchEmail: params.searchEmail,
-        page: params.page ?? 1,
-        sort: params.sort ?? "desc",
+        page: params.page,
+        sort: params.sort,
         limit: 50,
       },
     });
@@ -58,7 +58,7 @@ function formatDate(date: string | Date | null) {
 function AdminOrdersPage() {
   const { orders, total, page, limit } = Route.useLoaderData();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/admin/orders" });
+  const navigate = useNavigate({ from: "/admin/orders/" });
   const [emailInput, setEmailInput] = useState(search.searchEmail ?? "");
 
   function updateFilter(updates: Partial<z.infer<typeof searchSchema>>) {

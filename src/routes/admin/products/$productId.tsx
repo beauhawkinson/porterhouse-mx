@@ -59,6 +59,9 @@ function ProductEditPage() {
     (a, b) => SIZE_ORDER.indexOf(a.size as (typeof SIZE_ORDER)[number]) - SIZE_ORDER.indexOf(b.size as (typeof SIZE_ORDER)[number]),
   );
 
+  // Captured here so async closures below retain the narrowed (non-null) type
+  const { id: productId } = product;
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
@@ -85,7 +88,7 @@ function ProductEditPage() {
     setSaving(true);
     try {
       await updateProductFn({
-        data: { productId: product.id, ...parsed.data },
+        data: { productId, ...parsed.data },
       });
       setSaveMsg("Saved!");
       setTimeout(() => setSaveMsg(""), 2000);

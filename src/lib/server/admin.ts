@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { stripeClient } from "@/lib/config/stripe.config";
 import { db } from "@/lib/db/db";
-import { order, orderItem, product, productVariant } from "@/lib/db/schema";
+import { order, product, productVariant } from "@/lib/db/schema";
 import { checkIsAdmin, requireAdmin } from "@/lib/server/admin-guard";
 
 // ─── Auth check (used by navbar / root route) ────────────────────────────────

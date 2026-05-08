@@ -18,7 +18,7 @@ const config = defineConfig({
       // https://github.com/better-auth/better-auth/issues/7463#issuecomment-3874787825
       rollupConfig: {
         treeshake: {
-          moduleSideEffects: (id) => {
+          moduleSideEffects: (id: string) => {
             if (id.includes("reflect-metadata")) return true;
             // Nitro default configs - https://nitro.build/config#modulesideeffects
             if (id.includes("unenv/polyfill/")) return true;

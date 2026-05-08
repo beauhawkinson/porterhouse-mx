@@ -13,8 +13,8 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/orders/success")({
   validateSearch: searchSchema,
   loader: ({ location: { search } }) => {
-    const params = new URLSearchParams(search as string);
-    const sessionId = params.get("session_id");
+    const result = searchSchema.safeParse(search);
+    const sessionId = result.success ? result.data.session_id : undefined;
     if (!sessionId) return null;
     return getOrderBySessionId({ data: sessionId });
   },
