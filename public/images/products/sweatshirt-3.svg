@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#3E2A1E"/>
+  <!-- Crewneck silhouette (no hood) -->
+  <path d="M100,90 L60,130 L100,155 L100,330 L300,330 L300,155 L340,130 L300,90 L260,110 C245,130 230,135 200,135 C170,135 155,130 140,110 Z" fill="#C49A6C" opacity="0.9"/>
+  <!-- Crew neck line -->
+  <path d="M165,90 C170,105 200,115 200,115 C200,115 230,105 235,90 Z" fill="#b08855" opacity="0.9"/>
+  <circle cx="200" cy="195" r="28" fill="#8B5A2B" opacity="0.6"/>
+  <circle cx="192" cy="188" r="9" fill="#6B4423" opacity="0.7"/>
+  <circle cx="210" cy="203" r="6" fill="#3E2A1E" opacity="0.8"/>
+</svg>

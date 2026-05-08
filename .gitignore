@@ -1,0 +1,7 @@
+node_modules/
+.env
+.output/
+.vinxi/
+dist/
+drizzle/
+*.local

@@ -1,0 +1,128 @@
+import { createAPIFileRoute } from "@tanstack/start/api";
+import { eq, sql } from "drizzle-orm";
+import type Stripe from "stripe";
+import { stripeClient } from "@/lib/config/stripe.config";
+import { env } from "@/lib/config/t3.config";
+import { db } from "@/lib/db/db";
+import { order, orderItem, productVariant } from "@/lib/db/schema";
+
+export const APIRoute = createAPIFileRoute("/api/stripe/webhook")({
+  POST: async ({ request }) => {
+    const rawBody = await request.text();
+    const sig = request.headers.get("stripe-signature");
+
+    if (!sig) {
+      return new Response("Missing stripe-signature header", { status: 400 });
+    }
+
+    let event: Stripe.Event;
+    try {
+      event = stripeClient.webhooks.constructEvent(rawBody, sig, env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err);
+      return new Response("Invalid signature", { status: 400 });
+    }
+
+    try {
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          const orderInternalId = session.metadata?.orderInternalId;
+
+          if (!orderInternalId) {
+            console.warn("checkout.session.completed: no orderInternalId in metadata");
+            break;
+          }
+
+          const existing = await db.query.order.findFirst({
+            where: eq(order.id, orderInternalId),
+          });
+
+          if (!existing) {
+            console.warn(`Order ${orderInternalId} not found`);
+            break;
+          }
+
+          // Idempotency: skip if already paid
+          if (existing.status === "paid") break;
+
+          const shippingDetails = session.shipping_details;
+          const shippingAddress = shippingDetails?.address
+            ? {
+                line1: shippingDetails.address.line1 ?? "",
+                line2: shippingDetails.address.line2 ?? null,
+                city: shippingDetails.address.city ?? "",
+                state: shippingDetails.address.state ?? "",
+                postal: shippingDetails.address.postal_code ?? "",
+                country: shippingDetails.address.country ?? "",
+              }
+            : null;
+
+          await db.transaction(async (tx) => {
+            await tx
+              .update(order)
+              .set({
+                status: "paid",
+                stripePaymentIntentId:
+                  typeof session.payment_intent === "string"
+                    ? session.payment_intent
+                    : session.payment_intent?.id ?? null,
+                customerEmail: session.customer_details?.email ?? null,
+                shippingName: shippingDetails?.name ?? null,
+                shippingAddress,
+                amountTotalCents: session.amount_total,
+                currency: session.currency,
+                updatedAt: new Date(),
+              })
+              .where(eq(order.id, orderInternalId));
+
+            // Decrement stock for each order item (GREATEST prevents negative stock)
+            const items = await tx.query.orderItem.findMany({
+              where: eq(orderItem.orderId, orderInternalId),
+            });
+
+            for (const item of items) {
+              await tx
+                .update(productVariant)
+                .set({
+                  stock: sql`GREATEST(0, ${productVariant.stock} - ${item.quantity})`,
+                })
+                .where(eq(productVariant.id, item.variantId));
+            }
+          });
+
+          console.log(`Order ${orderInternalId} marked as paid.`);
+          break;
+        }
+
+        case "charge.refunded": {
+          const charge = event.data.object as Stripe.Charge;
+          const paymentIntentId =
+            typeof charge.payment_intent === "string"
+              ? charge.payment_intent
+              : charge.payment_intent?.id;
+
+          if (paymentIntentId) {
+            await db
+              .update(order)
+              .set({ status: "refunded", updatedAt: new Date() })
+              .where(eq(order.stripePaymentIntentId, paymentIntentId));
+            console.log(`Order with PI ${paymentIntentId} marked as refunded.`);
+          }
+          break;
+        }
+
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+    } catch (err) {
+      console.error("Webhook handler error:", err);
+      return new Response("Internal error", { status: 500 });
+    }
+
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+});

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#c0ad98"/>
+  <!-- Hoodie silhouette (slightly wider/longer) -->
+  <path d="M100,90 L60,130 L100,155 L100,330 L300,330 L300,155 L340,130 L300,90 L260,115 C245,150 200,160 195,155 C190,150 155,150 140,115 Z" fill="#3E2A1E" opacity="0.88"/>
+  <!-- Hood shape -->
+  <path d="M155,90 C160,60 240,60 245,90 C240,110 200,125 200,120 C200,125 160,110 155,90 Z" fill="#3E2A1E" opacity="0.88"/>
+  <!-- Pocket -->
+  <rect x="155" y="230" width="90" height="60" rx="2" fill="#2a1610" opacity="0.5"/>
+  <!-- Mud accent -->
+  <circle cx="200" cy="180" r="22" fill="#6B4423" opacity="0.5"/>
+  <circle cx="188" cy="172" r="8" fill="#8B5A2B" opacity="0.5"/>
+</svg>
