@@ -4,7 +4,7 @@ type Props = {
   opacity?: number;
 };
 
-export function Splatter1({ className = "", color = "#3E2A1E", opacity = 1 }: Props) {
+export function Splatter({ className = "", color = "#3E2A1E", opacity = 1 }: Props) {
   return (
     <svg
       viewBox="0 0 200 180"

@@ -21,17 +21,18 @@ export function SizeSelector({ variants, selectedVariantId, onSelect }: Props) {
 
         return (
           <button
+            type="button"
             key={size}
             onClick={() => variant && !outOfStock && onSelect(variant.id)}
             disabled={outOfStock}
             aria-pressed={selectedVariantId === variant?.id}
             className={[
-              "w-14 h-10 font-heading text-sm tracking-wider border transition-all duration-150",
+              "h-10 w-14 border font-heading text-sm tracking-wider transition-all duration-150",
               outOfStock
-                ? "border-[#e5e0d8] text-[#bbb] cursor-not-allowed line-through"
+                ? "cursor-not-allowed border-[#e5e0d8] text-[#bbb] line-through"
                 : selectedVariantId === variant?.id
-                ? "border-[#3E2A1E] bg-[#3E2A1E] text-white"
-                : "border-[#ccc] text-[#333] hover:border-[#8B5A2B] hover:text-[#6B4423] cursor-pointer",
+                  ? "border-[#3E2A1E] bg-[#3E2A1E] text-white"
+                  : "cursor-pointer border-[#ccc] text-[#333] hover:border-[#8B5A2B] hover:text-[#6B4423]",
             ].join(" ")}
           >
             {size}

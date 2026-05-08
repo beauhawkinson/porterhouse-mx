@@ -1,7 +1,26 @@
-node_modules/
-.env
-.output/
-.vinxi/
-dist/
-drizzle/
-*.local
+node_modules
+
+# TanStack
+.tanstack
+.nitro
+.output
+.vite
+dist
+
+# editor
+.vscode
+.zed
+.rules
+
+# environment
+*.env*
+
+# typescript
+tsconfig.tsbuildinfo
+
+# below are safe to commit
+!.env
+!.env.local.template
+
+# Vercel
+.vercel

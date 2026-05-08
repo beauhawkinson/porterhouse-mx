@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { app } from "../config/app.config";
+
 export type CartItem = {
   variantId: string;
   productId: string;
@@ -33,9 +35,7 @@ export const useCartStore = create<CartStore>()(
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.variantId === item.variantId
-                  ? { ...i, quantity: i.quantity + 1 }
-                  : i,
+                i.variantId === item.variantId ? { ...i, quantity: i.quantity + 1 } : i,
               ),
             };
           }
@@ -55,9 +55,7 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         set((state) => ({
-          items: state.items.map((i) =>
-            i.variantId === variantId ? { ...i, quantity } : i,
-          ),
+          items: state.items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)),
         }));
       },
 
@@ -68,7 +66,7 @@ export const useCartStore = create<CartStore>()(
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
     }),
     {
-      name: "jp-motorcross-cart",
+      name: `${app.name}-cart`,
     },
   ),
 );

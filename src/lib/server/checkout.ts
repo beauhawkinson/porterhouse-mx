@@ -1,10 +1,11 @@
-import { createServerFn } from "@tanstack/start";
-import { and, eq, inArray } from "drizzle-orm";
+import { createServerFn } from "@tanstack/react-start";
+import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
-import { order, orderItem, product, productVariant } from "@/lib/db/schema";
+import { order, orderItem, productVariant } from "@/lib/db/schema";
 
 const cartLineSchema = z.object({
   variantId: z.string().uuid(),
@@ -19,7 +20,7 @@ const checkoutInputSchema = z.object({
 });
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
-  .validator((data: unknown) => checkoutInputSchema.parse(data))
+  .inputValidator((data: unknown) => checkoutInputSchema.parse(data))
   .handler(async ({ data }) => {
     const variantIds = data.lines.map((l) => l.variantId);
 
@@ -91,9 +92,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           unit_amount: variant.product.priceCents,
           product_data: {
             name: `${variant.product.name} — Size ${variant.size}`,
-            images: variant.product.imageUrl.startsWith("http")
-              ? [variant.product.imageUrl]
-              : [],
+            images: variant.product.imageUrl.startsWith("http") ? [variant.product.imageUrl] : [],
           },
         },
         quantity: line.quantity,
@@ -103,29 +102,28 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const baseUrl = env.BETTER_AUTH_URL;
 
     // Build session params
-    const sessionParams: Parameters<typeof stripeClient.checkout.sessions.create>[0] =
-      {
-        mode: "payment",
-        line_items: lineItems,
-        shipping_address_collection: { allowed_countries: ["US"] },
-        phone_number_collection: { enabled: true },
-        shipping_options: [
-          {
-            shipping_rate_data: {
-              type: "fixed_amount",
-              fixed_amount: { amount: 800, currency: "usd" },
-              display_name: "USPS Ground Advantage",
-              delivery_estimate: {
-                minimum: { unit: "business_day", value: 5 },
-                maximum: { unit: "business_day", value: 10 },
-              },
+    const sessionParams: Parameters<typeof stripeClient.checkout.sessions.create>[0] = {
+      mode: "payment",
+      line_items: lineItems,
+      shipping_address_collection: { allowed_countries: ["US"] },
+      phone_number_collection: { enabled: true },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: 800, currency: "usd" },
+            display_name: "USPS Ground Advantage",
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 5 },
+              maximum: { unit: "business_day", value: 10 },
             },
           },
-        ],
-        metadata: { orderInternalId: newOrder.id },
-        success_url: `${baseUrl}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/cart`,
-      };
+        },
+      ],
+      metadata: { orderInternalId: newOrder.id },
+      success_url: `${baseUrl}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/cart`,
+    };
 
     if (data.stripeCustomerId) {
       sessionParams.customer = data.stripeCustomerId;
@@ -145,7 +143,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   });
 
 export const getOrderBySessionId = createServerFn({ method: "GET" })
-  .validator((sessionId: string) => sessionId)
+  .inputValidator((sessionId: string) => sessionId)
   .handler(async ({ data: sessionId }) => {
     const found = await db.query.order.findFirst({
       where: eq(order.stripeCheckoutSessionId, sessionId),

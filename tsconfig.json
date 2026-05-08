@@ -1,19 +1,28 @@
 {
+  "include": ["**/*.ts", "**/*.tsx", "vite.config.js"],
+
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "strict": true,
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "noEmit": true,
+
+    /* Linting */
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node"]
-  },
-  "include": ["src", "app.config.ts", "drizzle.config.ts"]
+    }
+  }
 }

@@ -1,10 +1,9 @@
+import { env } from "@/lib/config/t3.config";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: ["./src/lib/db/schema.ts", "./src/lib/db/relations.ts"],
-  out: "./drizzle",
+  out: "src/generated/drizzle",
   dialect: "postgresql",
-  dbCredentials: {
-    url: process.env["DATABASE_URL"]!,
-  },
+  dbCredentials: { url: env.DATABASE_URL },
 });

@@ -2,6 +2,7 @@ import { stripe } from "@better-auth/stripe";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+
 import { app } from "@/lib/config/app.config";
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";

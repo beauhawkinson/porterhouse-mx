@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+
 import { signIn } from "@/lib/auth-client";
-import { Splatter1, Splatter3 } from "@/components/splatter";
+import { app } from "@/lib/config/app.config";
 
 export const Route = createFileRoute("/sign-in")({
   component: SignInPage,
@@ -15,45 +16,40 @@ function SignInPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 relative overflow-hidden">
-      <Splatter1
-        className="absolute -top-16 -left-16 w-64 opacity-10 -rotate-12 pointer-events-none"
-        color="#3E2A1E"
-      />
-      <Splatter3
-        className="absolute bottom-0 right-0 w-40 opacity-10 rotate-6 pointer-events-none"
-        color="#6B4423"
-      />
-
-      <div className="w-full max-w-sm relative z-10">
-        <div className="text-center mb-10">
-          <Link to="/" className="font-heading text-xl tracking-widest text-[#111] hover:text-[#6B4423] transition-colors">
-            JP MOTORCROSS
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4">
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="mb-10 text-center">
+          <Link
+            to="/"
+            className="font-moto_is_life text-[#111] text-xl tracking-widest transition-colors hover:text-[#6B4423]"
+          >
+            {app.brand.name}
           </Link>
-          <h1 className="font-heading text-3xl text-[#111] mt-6 mb-2">SIGN IN</h1>
+          <h1 className="mt-6 mb-2 font-heading text-3xl text-[#111]">SIGN IN</h1>
           <p className="text-[#666] text-sm">
             Sign in to track your orders. Guest checkout is always available.
           </p>
         </div>
 
-        <div className="bg-white border border-[#e5e0d8] p-8">
+        <div className="border border-[#e5e0d8] bg-white p-8">
           <button
+            type="button"
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 border border-[#ddd] py-3 px-4 text-sm font-medium text-[#333] hover:border-[#8B5A2B] hover:text-[#6B4423] transition-all cursor-pointer"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 border border-[#ddd] px-4 py-3 font-medium text-[#333] text-sm transition-all hover:border-[#8B5A2B] hover:text-[#6B4423]"
           >
             <GoogleIcon />
             Continue with Google
           </button>
 
-          <p className="text-xs text-[#999] text-center mt-6">
+          <p className="mt-6 text-center text-[#999] text-xs">
             By signing in, you agree to our{" "}
-            <span className="underline cursor-pointer">terms of service</span>.
+            <span className="cursor-pointer underline">terms of service</span>.
           </p>
         </div>
 
-        <p className="text-center mt-6 text-sm text-[#666]">
+        <p className="mt-6 text-center text-[#666] text-sm">
           Just browsing?{" "}
-          <Link to="/shop" className="underline hover:text-[#6B4423] transition-colors">
+          <Link to="/shop" className="underline transition-colors hover:text-[#6B4423]">
             Continue to shop
           </Link>
         </p>
@@ -64,7 +60,7 @@ function SignInPage() {
 
 function GoogleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"

@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { z } from "zod";
-import { getOrderBySessionId } from "@/lib/server/checkout";
-import { Button } from "@/components/ui/Button";
-import { Splatter2, Splatter5 } from "@/components/splatter";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/cart/store";
+import { getOrderBySessionId } from "@/lib/server/checkout";
 
 const searchSchema = z.object({
   session_id: z.string(),
@@ -31,7 +31,7 @@ function SuccessPage() {
 
   if (!order) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
+      <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="font-heading text-3xl text-[#333]">ORDER NOT FOUND</h1>
         <Link to="/shop" className="mt-6 inline-block text-[#6B4423] underline">
           Continue shopping
@@ -41,45 +41,39 @@ function SuccessPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
+    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
       {/* Success header */}
-      <div className="relative text-center mb-12">
-        <Splatter2
-          className="absolute -top-8 -right-8 w-32 opacity-20 rotate-12 pointer-events-none"
-          color="#6B4423"
-        />
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-[#3E2A1E] rounded-full mb-6">
-          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="relative mb-12 text-center">
+        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#3E2A1E]">
+          <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <title>Success</title>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="font-heading text-4xl text-[#111] mb-2">ORDER CONFIRMED!</h1>
-        <p className="text-[#666]">
-          You'll get a confirmation email from Stripe shortly.
-        </p>
+        <h1 className="mb-2 font-heading text-4xl text-[#111]">ORDER CONFIRMED!</h1>
+        <p className="text-[#666]">You'll get a confirmation email from Stripe shortly.</p>
       </div>
 
       {/* Order details */}
-      <div className="bg-white border border-[#e5e0d8] p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="font-heading text-lg text-[#111]">ORDER DETAILS</h2>
-          <Splatter5 className="w-6 opacity-50" color="#8B5A2B" />
+      <div className="mb-6 border border-[#e5e0d8] bg-white p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <h2 className="font-heading text-[#111] text-lg">ORDER DETAILS</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+        <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-[#999] text-xs uppercase tracking-wider mb-1">Order ID</p>
-            <p className="font-mono text-xs text-[#333] break-all">{order.id}</p>
+            <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Order ID</p>
+            <p className="break-all font-mono text-[#333] text-xs">{order.id}</p>
           </div>
           {order.customerEmail && (
             <div>
-              <p className="text-[#999] text-xs uppercase tracking-wider mb-1">Email</p>
+              <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Email</p>
               <p className="text-[#333]">{order.customerEmail}</p>
             </div>
           )}
           {order.amountTotalCents && (
             <div>
-              <p className="text-[#999] text-xs uppercase tracking-wider mb-1">Total Paid</p>
+              <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Total Paid</p>
               <p className="font-semibold text-[#3E2A1E]">
                 {(order.amountTotalCents / 100).toLocaleString("en-US", {
                   style: "currency",
@@ -89,16 +83,16 @@ function SuccessPage() {
             </div>
           )}
           <div>
-            <p className="text-[#999] text-xs uppercase tracking-wider mb-1">Status</p>
-            <span className="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 uppercase tracking-wider">
+            <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Status</p>
+            <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs uppercase tracking-wider">
               {order.status}
             </span>
           </div>
         </div>
 
         {/* Items */}
-        <div className="border-t border-[#e5e0d8] pt-4">
-          <p className="font-heading text-sm tracking-wider text-[#333] mb-3">ITEMS</p>
+        <div className="border-[#e5e0d8] border-t pt-4">
+          <p className="mb-3 font-heading text-[#333] text-sm tracking-wider">ITEMS</p>
           <ul className="space-y-3">
             {order.items.map((item) => (
               <li key={item.id} className="flex justify-between text-sm">
@@ -118,23 +112,32 @@ function SuccessPage() {
 
         {/* Shipping address */}
         {order.shippingAddress && (
-          <div className="border-t border-[#e5e0d8] pt-4 mt-4">
-            <p className="font-heading text-sm tracking-wider text-[#333] mb-2">SHIPS TO</p>
-            <address className="not-italic text-sm text-[#555] leading-relaxed">
-              {order.shippingName}<br />
-              {order.shippingAddress.line1}<br />
-              {order.shippingAddress.line2 && <>{order.shippingAddress.line2}<br /></>}
+          <div className="mt-4 border-[#e5e0d8] border-t pt-4">
+            <p className="mb-2 font-heading text-[#333] text-sm tracking-wider">SHIPS TO</p>
+            <address className="text-[#555] text-sm not-italic leading-relaxed">
+              {order.shippingName}
+              <br />
+              {order.shippingAddress.line1}
+              <br />
+              {order.shippingAddress.line2 && (
+                <>
+                  {order.shippingAddress.line2}
+                  <br />
+                </>
+              )}
               {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-              {order.shippingAddress.postal}<br />
+              {order.shippingAddress.postal}
+              <br />
               {order.shippingAddress.country}
             </address>
           </div>
         )}
       </div>
 
-      <p className="text-sm text-[#666] mb-8 text-center">
-        The owner will receive your order and ship it within 3–5 business days.
-        You'll get a Stripe receipt via email. Reach out at{" "}
+      {/* TODO. Change this */}
+      <p className="mb-8 text-center text-[#666] text-sm">
+        The owner will receive your order and ship it within 3–5 business days. You'll get a Stripe
+        receipt via email. Reach out at{" "}
         <a href="mailto:shop@jpmotorcross.com" className="underline hover:text-[#6B4423]">
           shop@jpmotorcross.com
         </a>{" "}

@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Splatter5 } from "@/components/splatter";
 
 type Props = {
   slug: string;
@@ -20,37 +19,29 @@ export function ProductCard({ slug, name, priceCents, imageUrl, category, hasSto
     <Link
       to="/products/$slug"
       params={{ slug }}
-      className="group relative bg-white border border-[#e5e0d8] overflow-hidden flex flex-col hover:border-[#8B5A2B] transition-colors duration-200"
+      className="group relative flex flex-col overflow-hidden border border-[#e5e0d8] bg-white transition-colors duration-200 hover:border-[#8B5A2B]"
     >
-      {/* Mud splat accent corner */}
-      <Splatter5
-        className="absolute top-2 right-2 w-10 h-10 pointer-events-none opacity-30 group-hover:opacity-70 transition-opacity duration-300"
-        color="#6B4423"
-      />
-
       {/* Product image */}
       <div className="relative aspect-square overflow-hidden bg-[#f5f0eb]">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {!hasStock && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-            <span className="font-heading text-sm tracking-widest text-[#888]">SOLD OUT</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+            <span className="font-heading text-[#888] text-sm tracking-widest">SOLD OUT</span>
           </div>
         )}
       </div>
 
       {/* Info */}
-      <div className="p-4 flex flex-col gap-1">
-        <span className="text-xs text-[#999] tracking-widest uppercase font-medium">
+      <div className="flex flex-col gap-1 p-4">
+        <span className="font-medium text-[#999] text-xs uppercase tracking-widest">
           {category === "tshirt" ? "T-Shirt" : "Sweatshirt"}
         </span>
-        <h3 className="font-heading text-lg tracking-wide text-[#111] leading-tight">
-          {name}
-        </h3>
-        <p className="text-sm font-semibold text-[#3E2A1E] mt-1">{price}</p>
+        <h3 className="font-heading text-[#111] text-lg leading-tight tracking-wide">{name}</h3>
+        <p className="mt-1 font-semibold text-[#3E2A1E] text-sm">{price}</p>
       </div>
     </Link>
   );

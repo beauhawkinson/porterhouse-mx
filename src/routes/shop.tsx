@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { getProducts } from "@/lib/server/products";
+
 import { ProductCard } from "@/components/products/ProductCard";
-import { Splatter1, Splatter3 } from "@/components/splatter";
+import { getProducts } from "@/lib/server/products";
 
 const searchSchema = z.object({
   category: z.enum(["tshirt", "sweatshirt"]).optional(),
@@ -25,48 +25,40 @@ function ShopPage() {
   const filtered = filter === "all" ? products : products.filter((p) => p.category === filter);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
       {/* Header */}
       <div className="relative mb-12">
-        <Splatter1
-          className="absolute -top-4 -right-4 w-40 opacity-15 rotate-12"
-          color="#3E2A1E"
-        />
-        <h1 className="font-heading text-5xl text-[#111] mb-2">THE SHOP</h1>
-        <p className="text-[#666] text-base">
-          {products.length} products — ride-ready apparel for serious racers.
-        </p>
+        <h1 className="mb-2 font-heading text-5xl text-[#111]">THE SHOP</h1>
+        <p className="text-[#666] text-base">{products.length} products</p>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-2 mb-8 border-b border-[#e5e0d8] pb-4">
+      <div className="mb-8 flex items-center gap-2 border-[#e5e0d8] border-b pb-4">
         {(["all", "tshirt", "sweatshirt"] as const).map((cat) => (
           <button
+            type="button"
             key={cat}
             onClick={() => setFilter(cat)}
             className={[
-              "font-heading text-sm tracking-widest px-4 py-2 transition-all cursor-pointer",
-              filter === cat
-                ? "bg-[#3E2A1E] text-white"
-                : "text-[#666] hover:text-[#3E2A1E]",
+              "cursor-pointer px-4 py-2 font-heading text-sm tracking-widest transition-all",
+              filter === cat ? "bg-[#3E2A1E] text-white" : "text-[#666] hover:text-[#3E2A1E]",
             ].join(" ")}
           >
             {cat === "all" ? "ALL" : cat === "tshirt" ? "T-SHIRTS" : "SWEATSHIRTS"}
           </button>
         ))}
-        <div className="ml-auto flex items-center gap-2 text-sm text-[#999]">
-          <Splatter3 className="w-4 opacity-60" color="#8B5A2B" />
+        <div className="ml-auto flex items-center gap-2 text-[#999] text-sm">
           <span>{filtered.length} items</span>
         </div>
       </div>
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-24 text-[#999]">
+        <div className="py-24 text-center text-[#999]">
           <p className="font-heading text-2xl">NO PRODUCTS FOUND</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((p) => (
             <ProductCard
               key={p.id}

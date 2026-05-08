@@ -1,4 +1,6 @@
-import { useCartStore, type CartItem as CartItemType } from "@/lib/cart/store";
+import { useCartStore } from "@/lib/cart/store";
+
+import type { CartItem as CartItemType } from "@/lib/cart/store";
 
 type Props = {
   item: CartItemType;
@@ -16,37 +18,40 @@ export function CartItemRow({ item }: Props) {
   });
 
   return (
-    <div className="flex gap-4 py-5 border-b border-[#e5e0d8] last:border-0">
-      <div className="w-24 h-24 bg-[#f5f0eb] flex-shrink-0 overflow-hidden">
-        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+    <div className="flex gap-4 border-[#e5e0d8] border-b py-5 last:border-0">
+      <div className="h-24 w-24 flex-shrink-0 overflow-hidden bg-[#f5f0eb]">
+        <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
       </div>
 
-      <div className="flex-1 min-w-0">
-        <h3 className="font-heading text-base tracking-wide truncate">{item.name}</h3>
-        <p className="text-sm text-[#666] mt-0.5">Size: {item.size}</p>
-        <p className="text-sm text-[#999] mt-0.5">{price} each</p>
+      <div className="min-w-0 flex-1">
+        <h3 className="truncate font-heading text-base tracking-wide">{item.name}</h3>
+        <p className="mt-0.5 text-[#666] text-sm">Size: {item.size}</p>
+        <p className="mt-0.5 text-[#999] text-sm">{price} each</p>
 
-        <div className="flex items-center gap-3 mt-3">
+        <div className="mt-3 flex items-center gap-3">
           <div className="flex items-center border border-[#ddd]">
             <button
+              type="button"
               onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-              className="w-8 h-8 flex items-center justify-center text-[#555] hover:bg-[#f5f0eb] transition-colors cursor-pointer"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center text-[#555] transition-colors hover:bg-[#f5f0eb]"
               aria-label="Decrease quantity"
             >
               −
             </button>
-            <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
+            <span className="w-10 text-center font-medium text-sm">{item.quantity}</span>
             <button
+              type="button"
               onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-              className="w-8 h-8 flex items-center justify-center text-[#555] hover:bg-[#f5f0eb] transition-colors cursor-pointer"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center text-[#555] transition-colors hover:bg-[#f5f0eb]"
               aria-label="Increase quantity"
             >
               +
             </button>
           </div>
           <button
+            type="button"
             onClick={() => removeItem(item.variantId)}
-            className="text-xs text-[#999] hover:text-[#3E2A1E] transition-colors cursor-pointer underline"
+            className="cursor-pointer text-[#999] text-xs underline transition-colors hover:text-[#3E2A1E]"
           >
             Remove
           </button>

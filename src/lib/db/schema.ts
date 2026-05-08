@@ -67,12 +67,7 @@ export const verification = pgTable("verification", {
 
 export const categoryEnum = pgEnum("category", ["tshirt", "sweatshirt"]);
 export const sizeEnum = pgEnum("size", ["S", "M", "L", "XL", "XXL"]);
-export const orderStatusEnum = pgEnum("order_status", [
-  "pending",
-  "paid",
-  "fulfilled",
-  "refunded",
-]);
+export const orderStatusEnum = pgEnum("order_status", ["pending", "paid", "fulfilled", "refunded"]);
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
