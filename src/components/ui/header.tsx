@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
 
 import { signOut, useSession } from "@/lib/auth-client";
@@ -8,6 +8,7 @@ import { app } from "@/lib/config/app.config";
 export function Header() {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
+  const { isAdmin } = useRouteContext({ from: "__root__" });
 
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border-[#e5e0d8] border-b bg-[#FAFAF7]/80 backdrop-blur-sm">
@@ -28,6 +29,15 @@ export function Header() {
           >
             SHOP
           </Link>
+
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
+            >
+              ADMIN
+            </Link>
+          )}
 
           {session ? (
             <button

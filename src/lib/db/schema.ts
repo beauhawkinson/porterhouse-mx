@@ -121,6 +121,16 @@ export const order = pgTable("order", {
   customerEmail: text("customer_email"),
   shippingName: text("shipping_name"),
   shippingAddress: jsonb("shipping_address").$type<ShippingAddress>(),
+  fulfillmentStatus: text("fulfillment_status", {
+    enum: ["unfulfilled", "fulfilled", "shipped"],
+  })
+    .notNull()
+    .default("unfulfilled"),
+  trackingNumber: text("tracking_number"),
+  trackingCarrier: text("tracking_carrier"),
+  fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
+  shippedAt: timestamp("shipped_at", { withTimezone: true }),
+  internalNotes: text("internal_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

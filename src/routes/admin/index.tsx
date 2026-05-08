@@ -1,0 +1,159 @@
+import { Link, createFileRoute } from "@tanstack/react-router";
+
+import { getDashboardStatsFn } from "@/lib/server/admin";
+
+export const Route = createFileRoute("/admin/")({
+  loader: () => getDashboardStatsFn(),
+  component: AdminDashboard,
+});
+
+function formatCents(cents: number) {
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+function formatDate(date: string | Date | null) {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function AdminDashboard() {
+  const { fulfillmentCounts, totalRevenueCents, recentOrders } = Route.useLoaderData();
+
+  return (
+    <div className="space-y-8">
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard label="Total Revenue" value={formatCents(totalRevenueCents)} />
+        <StatCard label="Unfulfilled" value={String(fulfillmentCounts.unfulfilled)} accent="amber" />
+        <StatCard label="Fulfilled" value={String(fulfillmentCounts.fulfilled)} accent="green" />
+        <StatCard label="Shipped" value={String(fulfillmentCounts.shipped)} accent="blue" />
+      </div>
+
+      {/* Recent orders */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-lg tracking-wider text-[#333]">RECENT ORDERS</h2>
+          <Link to="/admin/orders" className="text-sm text-[#6B4423] underline hover:text-[#3E2A1E]">
+            View all
+          </Link>
+        </div>
+
+        {recentOrders.length === 0 ? (
+          <p className="py-8 text-center text-[#999]">No orders yet.</p>
+        ) : (
+          <div className="overflow-hidden border border-[#e5e0d8]">
+            <table className="w-full text-sm">
+              <thead className="bg-[#f5f0eb]">
+                <tr>
+                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                    DATE
+                  </th>
+                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                    CUSTOMER
+                  </th>
+                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                    TOTAL
+                  </th>
+                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                    STATUS
+                  </th>
+                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                    FULFILLMENT
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((o, i) => (
+                  <tr
+                    key={o.id}
+                    className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}
+                  >
+                    <td className="px-4 py-2 text-[#555]">{formatDate(o.createdAt)}</td>
+                    <td className="px-4 py-2 text-[#333]">
+                      <Link
+                        to="/admin/orders/$orderId"
+                        params={{ orderId: o.id }}
+                        className="underline hover:text-[#6B4423]"
+                      >
+                        {o.customerEmail ?? "—"}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 text-[#333]">
+                      {o.amountTotalCents ? formatCents(o.amountTotalCents) : "—"}
+                    </td>
+                    <td className="px-4 py-2">
+                      <PaymentBadge status={o.status} />
+                    </td>
+                    <td className="px-4 py-2">
+                      <FulfillmentBadge status={o.fulfillmentStatus} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: "amber" | "green" | "blue";
+}) {
+  const accentClass =
+    accent === "amber"
+      ? "text-amber-700"
+      : accent === "green"
+        ? "text-green-700"
+        : accent === "blue"
+          ? "text-blue-700"
+          : "text-[#111]";
+
+  return (
+    <div className="border border-[#e5e0d8] bg-white p-4">
+      <p className="mb-1 text-xs text-[#999] uppercase tracking-wider">{label}</p>
+      <p className={`font-heading text-2xl ${accentClass}`}>{value}</p>
+    </div>
+  );
+}
+
+export function PaymentBadge({ status }: { status: string }) {
+  const cls =
+    status === "paid"
+      ? "bg-green-100 text-green-800"
+      : status === "refunded"
+        ? "bg-red-100 text-red-800"
+        : "bg-[#f5f0eb] text-[#666]";
+
+  return (
+    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider ${cls}`}>
+      {status}
+    </span>
+  );
+}
+
+export function FulfillmentBadge({ status }: { status: string }) {
+  const cls =
+    status === "shipped"
+      ? "bg-green-100 text-green-800"
+      : status === "fulfilled"
+        ? "bg-blue-100 text-blue-800"
+        : "bg-amber-100 text-amber-800";
+
+  return (
+    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider ${cls}`}>
+      {status}
+    </span>
+  );
+}

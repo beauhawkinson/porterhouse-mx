@@ -2,7 +2,7 @@ import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { SizeSelector } from "@/components/products/SizeSelector";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useCartStore } from "@/lib/cart/store";
 import { getProductBySlug } from "@/lib/server/products";
 

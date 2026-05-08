@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { CartItemRow } from "@/components/cart/CartItem";
 import { Splatter } from "@/components/splatter";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useSession } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/server/checkout";
