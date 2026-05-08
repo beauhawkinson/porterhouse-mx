@@ -2,6 +2,13 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 import { listOrdersFn } from "@/lib/server/admin";
 
@@ -71,54 +78,64 @@ function AdminOrdersPage() {
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs text-[#999] uppercase tracking-wider">Payment</label>
-          <select
+          <Select
             value={search.paymentStatus ?? "all"}
-            onChange={(e) =>
+            onValueChange={(value) =>
               updateFilter({
-                paymentStatus: e.target.value as z.infer<typeof searchSchema>["paymentStatus"],
+                paymentStatus: value as z.infer<typeof searchSchema>["paymentStatus"],
               })
             }
-            className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]"
           >
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-            <option value="refunded">Refunded</option>
-          </select>
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="refunded">Refunded</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="text-xs text-[#999] uppercase tracking-wider">Fulfillment</label>
-          <select
+          <Select
             value={search.fulfillmentStatus ?? "all"}
-            onChange={(e) =>
+            onValueChange={(value) =>
               updateFilter({
-                fulfillmentStatus: e.target.value as z.infer<
-                  typeof searchSchema
-                >["fulfillmentStatus"],
+                fulfillmentStatus: value as z.infer<typeof searchSchema>["fulfillmentStatus"],
               })
             }
-            className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]"
           >
-            <option value="all">All</option>
-            <option value="unfulfilled">Unfulfilled</option>
-            <option value="fulfilled">Fulfilled</option>
-            <option value="shipped">Shipped</option>
-          </select>
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="unfulfilled">Unfulfilled</SelectItem>
+              <SelectItem value="fulfilled">Fulfilled</SelectItem>
+              <SelectItem value="shipped">Shipped</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="text-xs text-[#999] uppercase tracking-wider">Sort</label>
-          <select
+          <Select
             value={search.sort ?? "desc"}
-            onChange={(e) =>
-              updateFilter({ sort: e.target.value as "asc" | "desc" })
+            onValueChange={(value) =>
+              updateFilter({ sort: value as "asc" | "desc" })
             }
-            className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]"
           >
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
-          </select>
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Newest first</SelectItem>
+              <SelectItem value="asc">Oldest first</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <form onSubmit={handleEmailSearch} className="flex flex-col gap-1">
