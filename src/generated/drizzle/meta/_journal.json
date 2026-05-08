@@ -8,6 +8,13 @@
       "when": 1778272731657,
       "tag": "0000_serious_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778275004126,
+      "tag": "0001_yummy_black_queen",
+      "breakpoints": true
     }
   ]
 }

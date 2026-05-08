@@ -28,12 +28,14 @@ function CartPage() {
     setIsLoading(true);
     setError(null);
     try {
+      const stripeCustomerId = (session?.user as { stripeCustomerId?: string })?.stripeCustomerId;
+
       const result = await createCheckoutSession({
         data: {
           lines: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
           userId: session?.user?.id,
-          stripeCustomerId: (session?.user as { stripeCustomerId?: string })?.stripeCustomerId,
-          customerEmail: session?.user?.email,
+          ...(stripeCustomerId ? { stripeCustomerId } : {}),
+          customerEmail: session?.user?.email ?? undefined,
         },
       });
       window.location.href = result.url;
