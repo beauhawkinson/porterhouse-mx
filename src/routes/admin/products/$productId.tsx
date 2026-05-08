@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -56,7 +56,9 @@ function ProductEditPage() {
   }
 
   const sortedVariants = [...product.variants].sort(
-    (a, b) => SIZE_ORDER.indexOf(a.size as (typeof SIZE_ORDER)[number]) - SIZE_ORDER.indexOf(b.size as (typeof SIZE_ORDER)[number]),
+    (a, b) =>
+      SIZE_ORDER.indexOf(a.size as (typeof SIZE_ORDER)[number]) -
+      SIZE_ORDER.indexOf(b.size as (typeof SIZE_ORDER)[number]),
   );
 
   // Captured here so async closures below retain the narrowed (non-null) type
@@ -116,24 +118,24 @@ function ProductEditPage() {
         <button
           type="button"
           onClick={() => navigate({ to: "/admin/products" })}
-          className="text-sm text-[#999] hover:text-[#333]"
+          className="text-[#999] text-sm hover:text-[#333]"
         >
           ← Back
         </button>
-        <h2 className="font-heading text-xl tracking-wider text-[#111]">{product.name}</h2>
+        <h2 className="font-heading text-[#111] text-xl tracking-wider">{product.name}</h2>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Product form */}
         <section className="border border-[#e5e0d8] bg-white p-4">
-          <h3 className="mb-4 font-heading text-sm tracking-wider text-[#333]">PRODUCT DETAILS</h3>
+          <h3 className="mb-4 font-heading text-[#333] text-sm tracking-wider">PRODUCT DETAILS</h3>
           <form onSubmit={handleSave} className="space-y-4">
             <Field label="Name" error={errors.name}>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
             </Field>
 
@@ -142,7 +144,7 @@ function ProductEditPage() {
                 value={form.description}
                 onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                 rows={3}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
             </Field>
 
@@ -153,11 +155,11 @@ function ProductEditPage() {
                 min="0.01"
                 value={form.priceDollars}
                 onChange={(e) => setForm((p) => ({ ...p, priceDollars: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
               {product.priceCents !== Math.round(parseFloat(form.priceDollars) * 100) &&
                 !isNaN(parseFloat(form.priceDollars)) && (
-                  <p className="mt-1 text-xs text-amber-700">
+                  <p className="mt-1 text-amber-700 text-xs">
                     Price changed — will create a new Stripe Price and archive the old one.
                   </p>
                 )}
@@ -168,7 +170,7 @@ function ProductEditPage() {
                 type="text"
                 value={form.imageUrl}
                 onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
             </Field>
 
@@ -179,7 +181,7 @@ function ProductEditPage() {
                   setForm((p) => ({ ...p, category: value as "tshirt" | "sweatshirt" }))
                 }
               >
-                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none">
+                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -206,11 +208,11 @@ function ProductEditPage() {
 
         {/* Stock editor */}
         <section className="border border-[#e5e0d8] bg-white p-4">
-          <h3 className="mb-4 font-heading text-sm tracking-wider text-[#333]">STOCK BY SIZE</h3>
+          <h3 className="mb-4 font-heading text-[#333] text-sm tracking-wider">STOCK BY SIZE</h3>
           <div className="space-y-3">
             {sortedVariants.map((v) => (
               <div key={v.id} className="flex items-center gap-3">
-                <span className="w-10 font-heading text-sm tracking-wider text-[#555]">
+                <span className="w-10 font-heading text-[#555] text-sm tracking-wider">
                   {v.size}
                 </span>
                 <input
@@ -223,13 +225,13 @@ function ProductEditPage() {
                       [v.id]: Math.max(0, parseInt(e.target.value, 10) || 0),
                     }))
                   }
-                  className="w-20 border border-[#e5e0d8] px-2 py-1.5 text-sm text-[#333] focus:border-[#8B5A2B] focus:outline-none"
+                  className="w-20 border border-[#e5e0d8] px-2 py-1.5 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
                 />
                 <button
                   type="button"
                   disabled={stockSaving[v.id]}
                   onClick={() => handleStockSave(v.id)}
-                  className="text-xs text-[#6B4423] underline hover:text-[#3E2A1E] disabled:opacity-50"
+                  className="text-[#6B4423] text-xs underline hover:text-[#3E2A1E] disabled:opacity-50"
                 >
                   {stockSaving[v.id] ? "Saving…" : "Save"}
                 </button>
@@ -253,9 +255,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">{label}</label>
+      <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">{label}</p>
       {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-red-600 text-xs">{error}</p>}
     </div>
   );
 }

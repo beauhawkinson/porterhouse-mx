@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 import { getOrderFn, updateFulfillmentFn, updateOrderNotesFn } from "@/lib/server/admin";
+import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
 export const Route = createFileRoute("/admin/orders/$orderId")({
   loader: ({ params }) => getOrderFn({ data: params.orderId }),
@@ -53,7 +53,7 @@ function CopyButton({ value }: { value: string }) {
     <button
       type="button"
       onClick={copy}
-      className="ml-2 text-xs text-[#999] hover:text-[#6B4423] underline"
+      className="ml-2 text-[#999] text-xs underline hover:text-[#6B4423]"
     >
       {copied ? "Copied!" : "Copy"}
     </button>
@@ -80,10 +80,7 @@ function OrderDetailPage() {
   }
 
   const isRefunded = order.status === "refunded";
-  const subtotal = order.items.reduce(
-    (s, i) => s + i.priceCentsSnapshot * i.quantity,
-    0,
-  );
+  const subtotal = order.items.reduce((s, i) => s + i.priceCentsSnapshot * i.quantity, 0);
   const shipping = order.amountTotalCents ? order.amountTotalCents - subtotal : null;
 
   async function handleFulfillment(
@@ -115,18 +112,21 @@ function OrderDetailPage() {
   return (
     <div className="space-y-6">
       {/* Ship Dialog */}
-      <Dialog open={showShipModal} onOpenChange={(open) => { if (!open) setShowShipModal(false); }}>
+      <Dialog
+        open={showShipModal}
+        onOpenChange={(open) => {
+          if (!open) setShowShipModal(false);
+        }}
+      >
         <DialogContent side="center">
           <DialogHeader>
             <DialogTitle>Mark as Shipped</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
-                Carrier
-              </label>
+              <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">Carrier</p>
               <Select value={carrier} onValueChange={setCarrier}>
-                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333]">
+                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -138,21 +138,23 @@ function OrderDetailPage() {
               </Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs text-[#999] uppercase tracking-wider">
+              <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">
                 Tracking Number
-              </label>
+              </p>
               <input
                 type="text"
                 value={tracking}
                 onChange={(e) => setTracking(e.target.value)}
                 placeholder="1Z999AA10123456784"
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] placeholder:text-[#bbb]"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb]"
               />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button size="sm" variant="ghost">Cancel</Button>
+              <Button size="sm" variant="ghost">
+                Cancel
+              </Button>
             </DialogClose>
             <Button
               size="sm"
@@ -171,12 +173,14 @@ function OrderDetailPage() {
           <DialogHeader>
             <DialogTitle>Revert to Unfulfilled</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-[#555]">
+          <p className="text-[#555] text-sm">
             This will clear the fulfillment and shipping data from the order.
           </p>
           <DialogFooter>
             <DialogClose asChild>
-              <Button size="sm" variant="ghost">Cancel</Button>
+              <Button size="sm" variant="ghost">
+                Cancel
+              </Button>
             </DialogClose>
             <Button
               size="sm"
@@ -193,15 +197,15 @@ function OrderDetailPage() {
       </Dialog>
 
       {isRefunded && (
-        <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">
           <strong>Warning:</strong> This order has been refunded. Do not ship.
         </div>
       )}
 
       <div className="flex items-start justify-between">
         <div>
-          <p className="mb-1 text-xs text-[#999] uppercase tracking-wider">Order ID</p>
-          <p className="break-all font-mono text-sm text-[#333]">{order.id}</p>
+          <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Order ID</p>
+          <p className="break-all font-mono text-[#333] text-sm">{order.id}</p>
         </div>
         <div className="flex gap-2">
           <PaymentBadge status={order.status} />
@@ -212,10 +216,10 @@ function OrderDetailPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Customer */}
         <section className="border border-[#e5e0d8] bg-white p-4">
-          <h2 className="mb-3 font-heading text-sm tracking-wider text-[#333]">CUSTOMER</h2>
+          <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">CUSTOMER</h2>
           <div className="space-y-2 text-sm">
             <div>
-              <p className="text-xs text-[#999] uppercase tracking-wider">Email</p>
+              <p className="text-[#999] text-xs uppercase tracking-wider">Email</p>
               <p className="text-[#333]">
                 {order.customerEmail ?? "—"}
                 {order.customerEmail && <CopyButton value={order.customerEmail} />}
@@ -223,7 +227,7 @@ function OrderDetailPage() {
             </div>
             {order.shippingAddress && (
               <div>
-                <p className="text-xs text-[#999] uppercase tracking-wider">
+                <p className="text-[#999] text-xs uppercase tracking-wider">
                   Shipping Address
                   <CopyButton
                     value={[
@@ -237,7 +241,7 @@ function OrderDetailPage() {
                       .join("\n")}
                   />
                 </p>
-                <address className="mt-1 not-italic leading-relaxed text-[#333]">
+                <address className="mt-1 text-[#333] not-italic leading-relaxed">
                   {order.shippingName}
                   <br />
                   {order.shippingAddress.line1}
@@ -260,15 +264,22 @@ function OrderDetailPage() {
 
         {/* Order dates */}
         <section className="border border-[#e5e0d8] bg-white p-4">
-          <h2 className="mb-3 font-heading text-sm tracking-wider text-[#333]">TIMELINE</h2>
+          <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">TIMELINE</h2>
           <div className="space-y-2 text-sm">
-            <TimelineRow label="Ordered" value={formatDate(order.createdAt)} />
-            <TimelineRow label="Paid" value={order.status === "paid" || order.status === "fulfilled" ? formatDate(order.updatedAt) : "—"} />
-            <TimelineRow label="Fulfilled" value={formatDate(order.fulfilledAt)} />
-            <TimelineRow label="Shipped" value={formatDate(order.shippedAt)} />
+            <TimelineRow p="Ordered" value={formatDate(order.createdAt)} />
+            <TimelineRow
+              p="Paid"
+              value={
+                order.status === "paid" || order.status === "fulfilled"
+                  ? formatDate(order.updatedAt)
+                  : "—"
+              }
+            />
+            <TimelineRow p="Fulfilled" value={formatDate(order.fulfilledAt)} />
+            <TimelineRow p="Shipped" value={formatDate(order.shippedAt)} />
             {order.trackingNumber && (
               <TimelineRow
-                label={`Tracking (${order.trackingCarrier?.toUpperCase() ?? ""})`}
+                p={`Tracking (${order.trackingCarrier?.toUpperCase() ?? ""})`}
                 value={order.trackingNumber}
               />
             )}
@@ -279,21 +290,21 @@ function OrderDetailPage() {
       {/* Line items */}
       <section className="border border-[#e5e0d8] bg-white">
         <div className="border-[#e5e0d8] border-b bg-[#f5f0eb] px-4 py-2">
-          <h2 className="font-heading text-sm tracking-wider text-[#333]">ITEMS</h2>
+          <h2 className="font-heading text-[#333] text-sm tracking-wider">ITEMS</h2>
         </div>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-[#e5e0d8] border-b">
-              <th className="px-4 py-2 text-left text-xs text-[#999] uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-[#999] text-xs uppercase tracking-wider">
                 Product
               </th>
-              <th className="px-4 py-2 text-left text-xs text-[#999] uppercase tracking-wider">
+              <th className="px-4 py-2 text-left text-[#999] text-xs uppercase tracking-wider">
                 Size
               </th>
-              <th className="px-4 py-2 text-right text-xs text-[#999] uppercase tracking-wider">
+              <th className="px-4 py-2 text-right text-[#999] text-xs uppercase tracking-wider">
                 Qty
               </th>
-              <th className="px-4 py-2 text-right text-xs text-[#999] uppercase tracking-wider">
+              <th className="px-4 py-2 text-right text-[#999] text-xs uppercase tracking-wider">
                 Line Total
               </th>
             </tr>
@@ -333,7 +344,7 @@ function OrderDetailPage() {
 
       {/* Fulfillment actions */}
       <section className="border border-[#e5e0d8] bg-white p-4">
-        <h2 className="mb-3 font-heading text-sm tracking-wider text-[#333]">FULFILLMENT</h2>
+        <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">FULFILLMENT</h2>
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -364,11 +375,9 @@ function OrderDetailPage() {
 
       {/* Internal notes */}
       <section className="border border-[#e5e0d8] bg-white p-4">
-        <h2 className="mb-2 font-heading text-sm tracking-wider text-[#333]">
+        <h2 className="mb-2 font-heading text-[#333] text-sm tracking-wider">
           INTERNAL NOTES
-          {notesSaving && (
-            <span className="ml-2 text-xs font-normal text-[#999]">Saving…</span>
-          )}
+          {notesSaving && <span className="ml-2 font-normal text-[#999] text-xs">Saving…</span>}
         </h2>
         <textarea
           value={notes}
@@ -376,17 +385,17 @@ function OrderDetailPage() {
           onBlur={handleNotesSave}
           rows={4}
           placeholder="Private notes for the owner…"
-          className="w-full border border-[#e5e0d8] px-3 py-2 text-sm text-[#333] placeholder:text-[#bbb] focus:border-[#8B5A2B] focus:outline-none"
+          className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb] focus:border-[#8B5A2B] focus:outline-none"
         />
       </section>
     </div>
   );
 }
 
-function TimelineRow({ label, value }: { label: string; value: string }) {
+function TimelineRow({ p, value }: { p: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-[#999]">{label}</span>
+      <span className="text-[#999]">{p}</span>
       <span className="text-[#333]">{value}</span>
     </div>
   );

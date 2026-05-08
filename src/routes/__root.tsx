@@ -1,6 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 
-import { Footer } from "@/components/ui/Footer";
+import { Footer } from "@/components/ui/footer";
 import { Header } from "@/components/ui/header";
 import { app } from "@/lib/config/app.config";
 import { checkIsAdminFn } from "@/lib/server/admin";

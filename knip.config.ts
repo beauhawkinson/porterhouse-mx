@@ -1,7 +1,7 @@
 import type { KnipConfig } from "knip";
 
 const knipConfig: KnipConfig = {
-  ignoreDependencies: ["tailwindcss", "tw-animate-css"],
+  ignoreDependencies: ["tailwindcss", "tw-animate-css", "@biomejs/biome"],
   ignoreExportsUsedInFile: true,
   ignore: ["src/components/ui/**"],
   entry: ["src/routes/**/*.{ts,tsx}", "src/router.tsx"],

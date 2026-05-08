@@ -2,12 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-import type Stripe from "stripe";
-
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
 import { order, orderItem, productVariant } from "@/lib/db/schema";
+
+import type Stripe from "stripe";
 
 const cartLineSchema = z.object({
   variantId: z.string().uuid(),

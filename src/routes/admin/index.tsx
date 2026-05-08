@@ -28,7 +28,11 @@ function AdminDashboard() {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard label="Total Revenue" value={formatCents(totalRevenueCents)} />
-        <StatCard label="Unfulfilled" value={String(fulfillmentCounts.unfulfilled)} accent="amber" />
+        <StatCard
+          label="Unfulfilled"
+          value={String(fulfillmentCounts.unfulfilled)}
+          accent="amber"
+        />
         <StatCard label="Fulfilled" value={String(fulfillmentCounts.fulfilled)} accent="green" />
         <StatCard label="Shipped" value={String(fulfillmentCounts.shipped)} accent="blue" />
       </div>
@@ -36,8 +40,11 @@ function AdminDashboard() {
       {/* Recent orders */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-heading text-lg tracking-wider text-[#333]">RECENT ORDERS</h2>
-          <Link to="/admin/orders" className="text-sm text-[#6B4423] underline hover:text-[#3E2A1E]">
+          <h2 className="font-heading text-[#333] text-lg tracking-wider">RECENT ORDERS</h2>
+          <Link
+            to="/admin/orders"
+            className="text-[#6B4423] text-sm underline hover:text-[#3E2A1E]"
+          >
             View all
           </Link>
         </div>
@@ -49,29 +56,26 @@ function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-[#f5f0eb]">
                 <tr>
-                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                  <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                     DATE
                   </th>
-                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                  <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                     CUSTOMER
                   </th>
-                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                  <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                     TOTAL
                   </th>
-                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                  <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                     STATUS
                   </th>
-                  <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                  <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                     FULFILLMENT
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {recentOrders.map((o, i) => (
-                  <tr
-                    key={o.id}
-                    className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}
-                  >
+                  <tr key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
                     <td className="px-4 py-2 text-[#555]">{formatDate(o.createdAt)}</td>
                     <td className="px-4 py-2 text-[#333]">
                       <Link
@@ -122,7 +126,7 @@ function StatCard({
 
   return (
     <div className="border border-[#e5e0d8] bg-white p-4">
-      <p className="mb-1 text-xs text-[#999] uppercase tracking-wider">{label}</p>
+      <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">{label}</p>
       <p className={`font-heading text-2xl ${accentClass}`}>{value}</p>
     </div>
   );
@@ -137,7 +141,9 @@ export function PaymentBadge({ status }: { status: string }) {
         : "bg-[#f5f0eb] text-[#666]";
 
   return (
-    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider ${cls}`}>
+    <span
+      className={`inline-block rounded px-2 py-0.5 font-medium text-xs uppercase tracking-wider ${cls}`}
+    >
       {status}
     </span>
   );
@@ -152,7 +158,9 @@ export function FulfillmentBadge({ status }: { status: string }) {
         : "bg-amber-100 text-amber-800";
 
   return (
-    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium uppercase tracking-wider ${cls}`}>
+    <span
+      className={`inline-block rounded px-2 py-0.5 font-medium text-xs uppercase tracking-wider ${cls}`}
+    >
       {status}
     </span>
   );
