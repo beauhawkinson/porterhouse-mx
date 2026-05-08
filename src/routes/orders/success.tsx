@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/cart/store";
 import { getOrderBySessionId } from "@/lib/server/checkout";
 
@@ -13,8 +13,8 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/orders/success")({
   validateSearch: searchSchema,
   loader: ({ location: { search } }) => {
-    const params = new URLSearchParams(search as string);
-    const sessionId = params.get("session_id");
+    const result = searchSchema.safeParse(search);
+    const sessionId = result.success ? result.data.session_id : undefined;
     if (!sessionId) return null;
     return getOrderBySessionId({ data: sessionId });
   },

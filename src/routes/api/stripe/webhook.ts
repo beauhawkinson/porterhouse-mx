@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: Allow */
 import { createFileRoute } from "@tanstack/react-router";
 import { eq, sql } from "drizzle-orm";
 

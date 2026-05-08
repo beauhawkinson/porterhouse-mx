@@ -7,6 +7,8 @@ import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
 import { order, orderItem, productVariant } from "@/lib/db/schema";
 
+import type Stripe from "stripe";
+
 const cartLineSchema = z.object({
   variantId: z.string().uuid(),
   quantity: z.number().int().min(1),
@@ -102,7 +104,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const baseUrl = env.BETTER_AUTH_URL;
 
     // Build session params
-    const sessionParams: Parameters<typeof stripeClient.checkout.sessions.create>[0] = {
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       line_items: lineItems,
       shipping_address_collection: { allowed_countries: ["US"] },
@@ -139,7 +141,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       .set({ stripeCheckoutSessionId: session.id })
       .where(eq(order.id, newOrder.id));
 
-    return { url: session.url! };
+    const url = session.url;
+    if (!url) throw new Error("Stripe session URL not returned.");
+    return { url };
   });
 
 export const getOrderBySessionId = createServerFn({ method: "GET" })

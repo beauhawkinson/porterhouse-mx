@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { CartItemRow } from "@/components/cart/CartItem";
 import { Splatter } from "@/components/splatter";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/server/checkout";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, totalCents, clearCart } = useCartStore();
+  const { items, totalCents } = useCartStore();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ function CartPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const stripeCustomerId = (session?.user as { stripeCustomerId?: string })?.stripeCustomerId;
+      const stripeCustomerId = session?.user?.stripeCustomerId ?? undefined;
 
       const result = await createCheckoutSession({
         data: {

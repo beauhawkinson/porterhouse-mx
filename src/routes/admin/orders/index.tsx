@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 import { listOrdersFn } from "@/lib/server/admin";
+import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
 const searchSchema = z.object({
   paymentStatus: z.enum(["all", "pending", "paid", "refunded"]).optional().default("all"),
@@ -26,14 +26,14 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/admin/orders/")({
   validateSearch: searchSchema,
   loader: ({ location: { search } }) => {
-    const params = search as z.infer<typeof searchSchema>;
+    const params = searchSchema.parse(search);
     return listOrdersFn({
       data: {
-        paymentStatus: params.paymentStatus ?? "all",
-        fulfillmentStatus: params.fulfillmentStatus ?? "all",
+        paymentStatus: params.paymentStatus,
+        fulfillmentStatus: params.fulfillmentStatus,
         searchEmail: params.searchEmail,
-        page: params.page ?? 1,
-        sort: params.sort ?? "desc",
+        page: params.page,
+        sort: params.sort,
         limit: 50,
       },
     });
@@ -58,7 +58,7 @@ function formatDate(date: string | Date | null) {
 function AdminOrdersPage() {
   const { orders, total, page, limit } = Route.useLoaderData();
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/admin/orders" });
+  const navigate = useNavigate({ from: "/admin/orders/" });
   const [emailInput, setEmailInput] = useState(search.searchEmail ?? "");
 
   function updateFilter(updates: Partial<z.infer<typeof searchSchema>>) {
@@ -77,7 +77,7 @@ function AdminOrdersPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999] uppercase tracking-wider">Payment</label>
+          <p className="text-[#999] text-xs uppercase tracking-wider">Payment</p>
           <Select
             value={search.paymentStatus ?? "all"}
             onValueChange={(value) =>
@@ -86,7 +86,7 @@ function AdminOrdersPage() {
               })
             }
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -99,7 +99,7 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999] uppercase tracking-wider">Fulfillment</label>
+          <p className="text-[#999] text-xs uppercase tracking-wider">Fulfillment</p>
           <Select
             value={search.fulfillmentStatus ?? "all"}
             onValueChange={(value) =>
@@ -108,7 +108,7 @@ function AdminOrdersPage() {
               })
             }
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -121,14 +121,12 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999] uppercase tracking-wider">Sort</label>
+          <p className="text-[#999] text-xs uppercase tracking-wider">Sort</p>
           <Select
             value={search.sort ?? "desc"}
-            onValueChange={(value) =>
-              updateFilter({ sort: value as "asc" | "desc" })
-            }
+            onValueChange={(value) => updateFilter({ sort: value as "asc" | "desc" })}
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333]">
+            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -139,18 +137,18 @@ function AdminOrdersPage() {
         </div>
 
         <form onSubmit={handleEmailSearch} className="flex flex-col gap-1">
-          <label className="text-xs text-[#999] uppercase tracking-wider">Email search</label>
+          <p className="text-[#999] text-xs uppercase tracking-wider">Email search</p>
           <div className="flex gap-1">
             <input
               type="text"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="customer@example.com"
-              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333] placeholder:text-[#bbb]"
+              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm placeholder:text-[#bbb]"
             />
             <button
               type="submit"
-              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-sm text-[#333] hover:bg-[#f5f0eb]"
+              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm hover:bg-[#f5f0eb]"
             >
               Search
             </button>
@@ -161,7 +159,7 @@ function AdminOrdersPage() {
                   setEmailInput("");
                   updateFilter({ searchEmail: undefined });
                 }}
-                className="px-3 py-1.5 text-sm text-[#999] hover:text-[#333]"
+                className="px-3 py-1.5 text-[#999] text-sm hover:text-[#333]"
               >
                 Clear
               </button>
@@ -170,7 +168,7 @@ function AdminOrdersPage() {
         </form>
       </div>
 
-      <p className="text-sm text-[#999]">
+      <p className="text-[#999] text-sm">
         {total} order{total !== 1 ? "s" : ""}
         {search.searchEmail ? ` matching "${search.searchEmail}"` : ""}
       </p>
@@ -185,22 +183,22 @@ function AdminOrdersPage() {
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-[#f5f0eb]">
               <tr>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   DATE
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   CUSTOMER
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   ITEMS
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   TOTAL
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   PAYMENT
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   FULFILLMENT
                 </th>
                 <th className="px-4 py-2" />
@@ -210,7 +208,7 @@ function AdminOrdersPage() {
               {orders.map((o, i) => (
                 <tr
                   key={o.id}
-                  className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} hover:bg-[#f5f0eb] transition-colors`}
+                  className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} transition-colors hover:bg-[#f5f0eb]`}
                 >
                   <td className="whitespace-nowrap px-4 py-2 text-[#555]">
                     {formatDate(o.createdAt)}
@@ -232,7 +230,7 @@ function AdminOrdersPage() {
                     <Link
                       to="/admin/orders/$orderId"
                       params={{ orderId: o.id }}
-                      className="font-heading text-xs tracking-wider text-[#6B4423] underline hover:text-[#3E2A1E]"
+                      className="font-heading text-[#6B4423] text-xs tracking-wider underline hover:text-[#3E2A1E]"
                     >
                       View
                     </Link>
@@ -255,7 +253,7 @@ function AdminOrdersPage() {
               type="button"
               disabled={page <= 1}
               onClick={() => navigate({ search: (prev) => ({ ...prev, page: page - 1 }) })}
-              className="border border-[#e5e0d8] px-3 py-1 text-[#333] disabled:opacity-40 hover:bg-[#f5f0eb]"
+              className="border border-[#e5e0d8] px-3 py-1 text-[#333] hover:bg-[#f5f0eb] disabled:opacity-40"
             >
               Prev
             </button>
@@ -263,7 +261,7 @@ function AdminOrdersPage() {
               type="button"
               disabled={page >= totalPages}
               onClick={() => navigate({ search: (prev) => ({ ...prev, page: page + 1 }) })}
-              className="border border-[#e5e0d8] px-3 py-1 text-[#333] disabled:opacity-40 hover:bg-[#f5f0eb]"
+              className="border border-[#e5e0d8] px-3 py-1 text-[#333] hover:bg-[#f5f0eb] disabled:opacity-40"
             >
               Next
             </button>

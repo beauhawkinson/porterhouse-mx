@@ -25,7 +25,7 @@ function AdminProductsPage() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[#999]">{products.length} products</p>
+      <p className="text-[#999] text-sm">{products.length} products</p>
 
       {products.length === 0 ? (
         <div className="py-16 text-center text-[#999]">
@@ -37,16 +37,16 @@ function AdminProductsPage() {
             <thead className="bg-[#f5f0eb]">
               <tr>
                 <th className="w-16 px-4 py-2" />
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   NAME
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   CATEGORY
                 </th>
-                <th className="px-4 py-2 text-left font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
                   PRICE
                 </th>
-                <th className="px-4 py-2 text-right font-heading text-xs tracking-wider text-[#666]">
+                <th className="px-4 py-2 text-right font-heading text-[#666] text-xs tracking-wider">
                   TOTAL STOCK
                 </th>
                 <th className="px-4 py-2" />
@@ -63,15 +63,11 @@ function AdminProductsPage() {
                   <>
                     <tr
                       key={p.id}
-                      className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} hover:bg-[#f5f0eb] transition-colors`}
+                      className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} transition-colors hover:bg-[#f5f0eb]`}
                     >
                       <td className="px-4 py-2">
                         {p.imageUrl && (
-                          <img
-                            src={p.imageUrl}
-                            alt={p.name}
-                            className="h-10 w-10 object-cover"
-                          />
+                          <img src={p.imageUrl} alt={p.name} className="h-10 w-10 object-cover" />
                         )}
                       </td>
                       <td className="px-4 py-2 font-medium text-[#333]">{p.name}</td>
@@ -100,14 +96,14 @@ function AdminProductsPage() {
                           <button
                             type="button"
                             onClick={() => toggle(p.id)}
-                            className="text-xs text-[#999] underline hover:text-[#333]"
+                            className="text-[#999] text-xs underline hover:text-[#333]"
                           >
                             {isExpanded ? "Hide sizes" : "Show sizes"}
                           </button>
                           <Link
                             to="/admin/products/$productId"
                             params={{ productId: p.id }}
-                            className="font-heading text-xs tracking-wider text-[#6B4423] underline hover:text-[#3E2A1E]"
+                            className="font-heading text-[#6B4423] text-xs tracking-wider underline hover:text-[#3E2A1E]"
                           >
                             Edit
                           </Link>
@@ -120,7 +116,7 @@ function AdminProductsPage() {
                           <div className="flex flex-wrap gap-4">
                             {sortedVariants.map((v) => (
                               <div key={v.id} className="text-sm">
-                                <span className="font-heading text-xs tracking-wider text-[#666]">
+                                <span className="font-heading text-[#666] text-xs tracking-wider">
                                   {v.size}
                                 </span>
                                 <span
