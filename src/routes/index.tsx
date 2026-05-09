@@ -1,7 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { ProductCard } from "@/components/products/ProductCard";
-import { Splatter } from "@/components/splatter";
 import { Button } from "@/components/ui/button";
 import { app } from "@/lib/config/app.config";
 import { getFeaturedProducts } from "@/lib/server/products";
@@ -40,7 +39,6 @@ function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex items-end gap-4">
           <h2 className="font-heading text-4xl text-[#111] leading-none">FEATURED GEAR</h2>
-          <Splatter className="mb-1 w-8 opacity-70" color="#6B4423" />
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
