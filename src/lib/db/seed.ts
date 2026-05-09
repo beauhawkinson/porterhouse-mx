@@ -13,7 +13,7 @@ const TSHIRTS = [
     description:
       "Embrace the grime. The Mud Demon Tee is a heavy-weight 100% cotton shirt built for riders who leave it all on the track. Bold graphics, pre-shrunk, and ready to get dirty.",
     priceCents: 2999,
-    imageUrl: "/images/products/tshirt-1.svg",
+    imageUrl: "/images/products/placeholder.svg",
     category: "tshirt" as const,
   },
   {
@@ -22,7 +22,7 @@ const TSHIRTS = [
     description:
       "Named for the first corner advantage. The Holeshot Tee keeps you looking sharp whether you're staging on the line or loading up the truck after a win.",
     priceCents: 2999,
-    imageUrl: "/images/products/tshirt-2.svg",
+    imageUrl: "/images/products/placeholder.svg",
     category: "tshirt" as const,
   },
 ];
@@ -34,7 +34,7 @@ const SWEATSHIRTS = [
     description:
       "Post-moto warmth, track-ready style. The Holeshot Hoodie is a heavy fleece pullover with a kangaroo pocket and embroidered Porterhouse MX logo on the chest.",
     priceCents: 6499,
-    imageUrl: "/images/products/sweatshirt-1.svg",
+    imageUrl: "/images/products/placeholder.svg",
     category: "sweatshirt" as const,
   },
   {
@@ -43,7 +43,7 @@ const SWEATSHIRTS = [
     description:
       "There's no off-season when you love the mud. The Mud Season Hoodie is your every-day, every-track warmth layer — 14oz fleece and a drawstring hood that actually stays put.",
     priceCents: 6999,
-    imageUrl: "/images/products/sweatshirt-2.svg",
+    imageUrl: "/images/products/placeholder.svg",
     category: "sweatshirt" as const,
   },
 ];
