@@ -37,7 +37,7 @@ export function ProductCard({ slug, name, priceCents, imageUrl, category, hasSto
 
       {/* Info */}
       <div className="flex flex-col gap-1 p-4">
-        <span className="font-medium text-[#999] text-xs uppercase tracking-widest">
+        <span className="font-medium text-[#999] text-xs tracking-widest">
           {category === "tshirt" ? "T-Shirt" : "Sweatshirt"}
         </span>
         <h3 className="font-heading text-[#111] text-lg leading-tight tracking-wide">{name}</h3>

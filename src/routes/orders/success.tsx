@@ -62,29 +62,29 @@ function SuccessPage() {
 
         <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Order ID</p>
+            <p className="mb-1 text-[#999] text-xs tracking-wider">Order ID</p>
             <p className="break-all font-mono text-[#333] text-xs">{order.id}</p>
           </div>
           {order.customerEmail && (
             <div>
-              <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Email</p>
+              <p className="mb-1 text-[#999] text-xs tracking-wider">Email</p>
               <p className="text-[#333]">{order.customerEmail}</p>
             </div>
           )}
           {order.amountTotalCents && (
             <div>
-              <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Total Paid</p>
+              <p className="mb-1 text-[#999] text-xs tracking-wider">Total Paid</p>
               <p className="font-semibold text-[#3E2A1E]">
                 {(order.amountTotalCents / 100).toLocaleString("en-US", {
                   style: "currency",
-                  currency: order.currency?.toUpperCase() ?? "USD",
+                  currency: order.currency?.to() ?? "USD",
                 })}
               </p>
             </div>
           )}
           <div>
-            <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Status</p>
-            <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs uppercase tracking-wider">
+            <p className="mb-1 text-[#999] text-xs tracking-wider">Status</p>
+            <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs tracking-wider">
               {order.status}
             </span>
           </div>

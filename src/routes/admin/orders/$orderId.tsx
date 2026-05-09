@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,6 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getOrderFn, updateFulfillmentFn, updateOrderNotesFn } from "@/lib/server/admin";
 import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
@@ -124,10 +134,13 @@ function OrderDetailPage() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">Carrier</p>
+              <p className="mb-1 block text-[#999] text-xs tracking-wider">Carrier</p>
               <Select value={carrier} onValueChange={setCarrier}>
-                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm">
-                  <SelectValue />
+                <SelectTrigger asChild>
+                  <Button variant="outline">
+                    <SelectValue />
+                    <ChevronDown className="size-4" />
+                  </Button>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="usps">USPS</SelectItem>
@@ -138,15 +151,12 @@ function OrderDetailPage() {
               </Select>
             </div>
             <div>
-              <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">
-                Tracking Number
-              </p>
-              <input
+              <p className="mb-1 block text-[#999] text-xs tracking-wider">Tracking Number</p>
+              <Input
                 type="text"
                 value={tracking}
                 onChange={(e) => setTracking(e.target.value)}
                 placeholder="1Z999AA10123456784"
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb]"
               />
             </div>
           </div>
@@ -204,7 +214,7 @@ function OrderDetailPage() {
 
       <div className="flex items-start justify-between">
         <div>
-          <p className="mb-1 text-[#999] text-xs uppercase tracking-wider">Order ID</p>
+          <p className="mb-1 text-[#999] text-xs tracking-wider">Order ID</p>
           <p className="break-all font-mono text-[#333] text-sm">{order.id}</p>
         </div>
         <div className="flex gap-2">
@@ -219,7 +229,7 @@ function OrderDetailPage() {
           <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">CUSTOMER</h2>
           <div className="space-y-2 text-sm">
             <div>
-              <p className="text-[#999] text-xs uppercase tracking-wider">Email</p>
+              <p className="text-[#999] text-xs tracking-wider">Email</p>
               <p className="text-[#333]">
                 {order.customerEmail ?? "—"}
                 {order.customerEmail && <CopyButton value={order.customerEmail} />}
@@ -227,7 +237,7 @@ function OrderDetailPage() {
             </div>
             {order.shippingAddress && (
               <div>
-                <p className="text-[#999] text-xs uppercase tracking-wider">
+                <p className="text-[#999] text-xs tracking-wider">
                   Shipping Address
                   <CopyButton
                     value={[
@@ -279,7 +289,7 @@ function OrderDetailPage() {
             <TimelineRow p="Shipped" value={formatDate(order.shippedAt)} />
             {order.trackingNumber && (
               <TimelineRow
-                p={`Tracking (${order.trackingCarrier?.toUpperCase() ?? ""})`}
+                p={`Tracking (${order.trackingCarrier?.to() ?? ""})`}
                 value={order.trackingNumber}
               />
             )}
@@ -292,36 +302,26 @@ function OrderDetailPage() {
         <div className="border-[#e5e0d8] border-b bg-[#f5f0eb] px-4 py-2">
           <h2 className="font-heading text-[#333] text-sm tracking-wider">ITEMS</h2>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-[#e5e0d8] border-b">
-              <th className="px-4 py-2 text-left text-[#999] text-xs uppercase tracking-wider">
-                Product
-              </th>
-              <th className="px-4 py-2 text-left text-[#999] text-xs uppercase tracking-wider">
-                Size
-              </th>
-              <th className="px-4 py-2 text-right text-[#999] text-xs uppercase tracking-wider">
-                Qty
-              </th>
-              <th className="px-4 py-2 text-right text-[#999] text-xs uppercase tracking-wider">
-                Line Total
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader className="bg-[#f5f0eb]">
+            <TableRow>
+              <TableHead>Product</TableHead>
+              <TableHead>Size</TableHead>
+              <TableHead>Qty</TableHead>
+              <TableHead> Line Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {order.items.map((item) => (
-              <tr key={item.id} className="border-[#e5e0d8] border-b last:border-0">
-                <td className="px-4 py-2 text-[#333]">{item.nameSnapshot}</td>
-                <td className="px-4 py-2 text-[#555]">{item.sizeSnapshot}</td>
-                <td className="px-4 py-2 text-right text-[#555]">{item.quantity}</td>
-                <td className="px-4 py-2 text-right text-[#333]">
-                  {formatCents(item.priceCentsSnapshot * item.quantity)}
-                </td>
-              </tr>
+              <TableRow key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                <TableCell>{item.nameSnapshot}</TableCell>
+                <TableCell>{item.sizeSnapshot}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>{formatCents(item.priceCentsSnapshot * item.quantity)}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         <div className="border-[#e5e0d8] border-t px-4 py-3 text-sm">
           <div className="flex justify-between text-[#555]">
             <span>Subtotal</span>

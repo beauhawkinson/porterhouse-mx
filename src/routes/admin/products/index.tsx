@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { listAdminProductsFn } from "@/lib/server/admin";
 
 export const Route = createFileRoute("/admin/products/")({
@@ -32,27 +33,19 @@ function AdminProductsPage() {
           <p className="font-heading text-xl">NO PRODUCTS</p>
         </div>
       ) : (
-        <div className="border border-[#e5e0d8]">
-          <table className="w-full text-sm">
-            <thead className="bg-[#f5f0eb]">
-              <tr>
-                <th className="w-16 px-4 py-2" />
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  NAME
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  CATEGORY
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  PRICE
-                </th>
-                <th className="px-4 py-2 text-right font-heading text-[#666] text-xs tracking-wider">
-                  TOTAL STOCK
-                </th>
-                <th className="px-4 py-2" />
-              </tr>
-            </thead>
-            <tbody>
+        <div className="rounded-lg border border-[#e5e0d8]">
+          <Table>
+            <TableHeader className="bg-[#f5f0eb]">
+              <TableRow>
+                <TableHead className="w-16 px-4 py-2" />
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Total Stock</TableHead>
+                <TableHead className="px-4 py-2" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {products.map((p, i) => {
                 const isExpanded = expanded.has(p.id);
                 const sortedVariants = [...p.variants].sort(
@@ -61,24 +54,21 @@ function AdminProductsPage() {
 
                 return (
                   <>
-                    <tr
-                      key={p.id}
-                      className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} transition-colors hover:bg-[#f5f0eb]`}
-                    >
-                      <td className="px-4 py-2">
+                    <TableRow key={p.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                      <TableHead>
                         {p.imageUrl && (
                           <img src={p.imageUrl} alt={p.name} className="h-10 w-10 object-cover" />
                         )}
-                      </td>
-                      <td className="px-4 py-2 font-medium text-[#333]">{p.name}</td>
-                      <td className="px-4 py-2 text-[#555] capitalize">{p.category}</td>
-                      <td className="px-4 py-2 text-[#555]">
+                      </TableHead>
+                      <TableHead>{p.name}</TableHead>
+                      <TableHead>{p.category}</TableHead>
+                      <TableHead>
                         {(p.priceCents / 100).toLocaleString("en-US", {
                           style: "currency",
                           currency: "USD",
                         })}
-                      </td>
-                      <td className="px-4 py-2 text-right">
+                      </TableHead>
+                      <TableHead>
                         <span
                           className={
                             p.totalStock === 0
@@ -90,8 +80,8 @@ function AdminProductsPage() {
                         >
                           {p.totalStock}
                         </span>
-                      </td>
-                      <td className="px-4 py-2">
+                      </TableHead>
+                      <TableHead>
                         <div className="flex items-center gap-3">
                           <button
                             type="button"
@@ -108,10 +98,10 @@ function AdminProductsPage() {
                             Edit
                           </Link>
                         </div>
-                      </td>
-                    </tr>
+                      </TableHead>
+                    </TableRow>
                     {isExpanded && (
-                      <tr key={`${p.id}-variants`} className="bg-[#f5f0eb]">
+                      <TableRow key={`${p.id}-variants`} className="bg-[#f5f0eb]">
                         <td colSpan={6} className="px-8 py-3">
                           <div className="flex flex-wrap gap-4">
                             {sortedVariants.map((v) => (
@@ -128,13 +118,13 @@ function AdminProductsPage() {
                             ))}
                           </div>
                         </td>
-                      </tr>
+                      </TableRow>
                     )}
                   </>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

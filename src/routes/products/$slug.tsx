@@ -78,7 +78,7 @@ function ProductDetailPage() {
 
         {/* Details */}
         <div className="flex flex-col">
-          <span className="mb-2 font-medium text-[#8B5A2B] text-xs uppercase tracking-[0.3em]">
+          <span className="mb-2 font-medium text-[#8B5A2B] text-xs tracking-[0.3em]">
             {product.category === "tshirt" ? "T-Shirt" : "Sweatshirt"}
           </span>
           <h1 className="mb-4 font-heading text-4xl text-[#111] leading-none sm:text-5xl">

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <div className="mx-auto flex w-full max-w-4xl flex-col px-4 py-8 sm:px-6">
       <header className="mb-8 flex items-center justify-between border-[#e5e0d8] border-b pb-4">
         <h1 className="font-heading text-3xl text-[#111] tracking-wider">ADMIN</h1>
         <nav className="flex gap-6 font-medium text-sm">

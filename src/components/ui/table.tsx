@@ -3,7 +3,11 @@ import type * as React from "react";
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div data-slot="table-container" className="relative w-full">
-      <table data-slot="table" className="h-full w-full table-auto caption-bottom" {...props} />
+      <table
+        data-slot="table"
+        className="h-full w-full table-auto caption-bottom rounded-lg"
+        {...props}
+      />
     </div>
   );
 }
@@ -46,7 +50,7 @@ function TableHead({ ...props }: React.ComponentProps<"th">) {
   return (
     <th
       data-slot="table-head"
-      className="h-10 whitespace-nowrap text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5"
+      className="h-10 whitespace-nowrap px-2 text-left align-middle font-medium text-muted-foreground text-xs [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5"
       {...props}
     />
   );
@@ -56,7 +60,7 @@ function TableCell({ ...props }: React.ComponentProps<"td">) {
   return (
     <td
       data-slot="table-cell"
-      className="whitespace-nowrap py-1 align-middle text-secondary-foreground [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5"
+      className="whitespace-nowrap px-2 py-3 align-middle text-secondary-foreground text-xs [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5"
       {...props}
     />
   );

@@ -27,15 +27,15 @@ export function Header() {
             to="/shop"
             className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
           >
-            SHOP
+            Shop
           </Link>
 
-          {isAdmin && (
+          {isAdmin && session && (
             <Link
               to="/admin"
               className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
             >
-              ADMIN
+              Admin
             </Link>
           )}
 
@@ -45,14 +45,14 @@ export function Header() {
               onClick={() => signOut()}
               className="cursor-pointer font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
             >
-              SIGN OUT
+              Logout
             </button>
           ) : (
             <Link
               to="/sign-in"
               className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
             >
-              SIGN IN
+              Sign In
             </Link>
           )}
         </nav>

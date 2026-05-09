@@ -1,7 +1,10 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,6 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { listOrdersFn } from "@/lib/server/admin";
 import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
@@ -77,7 +88,7 @@ function AdminOrdersPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs uppercase tracking-wider">Payment</p>
+          <p className="text-[#999] text-xs tracking-wider">Payment</p>
           <Select
             value={search.paymentStatus ?? "all"}
             onValueChange={(value) =>
@@ -86,8 +97,11 @@ function AdminOrdersPage() {
               })
             }
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
-              <SelectValue />
+            <SelectTrigger asChild>
+              <Button variant="outline">
+                <SelectValue />
+                <ChevronDown className="size-4" />
+              </Button>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
@@ -99,7 +113,7 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs uppercase tracking-wider">Fulfillment</p>
+          <p className="text-[#999] text-xs tracking-wider">Fulfillment</p>
           <Select
             value={search.fulfillmentStatus ?? "all"}
             onValueChange={(value) =>
@@ -108,8 +122,11 @@ function AdminOrdersPage() {
               })
             }
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
-              <SelectValue />
+            <SelectTrigger asChild>
+              <Button variant="outline">
+                <SelectValue />
+                <ChevronDown className="size-4" />
+              </Button>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
@@ -121,13 +138,16 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs uppercase tracking-wider">Sort</p>
+          <p className="text-[#999] text-xs tracking-wider">Sort</p>
           <Select
             value={search.sort ?? "desc"}
             onValueChange={(value) => updateFilter({ sort: value as "asc" | "desc" })}
           >
-            <SelectTrigger className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm">
-              <SelectValue />
+            <SelectTrigger asChild>
+              <Button variant="outline">
+                <SelectValue />
+                <ChevronDown className="size-4" />
+              </Button>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="desc">Newest first</SelectItem>
@@ -137,14 +157,13 @@ function AdminOrdersPage() {
         </div>
 
         <form onSubmit={handleEmailSearch} className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs uppercase tracking-wider">Email search</p>
+          <p className="text-[#999] text-xs tracking-wider">Email search</p>
           <div className="flex gap-1">
-            <input
+            <Input
               type="text"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="customer@example.com"
-              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm placeholder:text-[#bbb]"
+              placeholder="beau@gmail.com"
             />
             <button
               type="submit"
@@ -179,54 +198,33 @@ function AdminOrdersPage() {
           <p className="font-heading text-xl">NO ORDERS FOUND</p>
         </div>
       ) : (
-        <div className="overflow-x-auto border border-[#e5e0d8]">
-          <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-[#f5f0eb]">
-              <tr>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  DATE
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  CUSTOMER
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  ITEMS
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  TOTAL
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  PAYMENT
-                </th>
-                <th className="px-4 py-2 text-left font-heading text-[#666] text-xs tracking-wider">
-                  FULFILLMENT
-                </th>
-                <th className="px-4 py-2" />
-              </tr>
-            </thead>
-            <tbody>
+        <div className="overflow-x-auto rounded-lg border">
+          <Table>
+            <TableHeader className="bg-[#f5f0eb]">
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Items</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Fulfillment</TableHead>
+                <TableHead className="px-4 py-2" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {orders.map((o, i) => (
-                <tr
-                  key={o.id}
-                  className={`border-[#e5e0d8] border-t ${i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"} transition-colors hover:bg-[#f5f0eb]`}
-                >
-                  <td className="whitespace-nowrap px-4 py-2 text-[#555]">
-                    {formatDate(o.createdAt)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <div className="text-[#333]">{o.customerEmail ?? "—"}</div>
-                  </td>
-                  <td className="px-4 py-2 text-[#555]">{o.items.length}</td>
-                  <td className="whitespace-nowrap px-4 py-2 text-[#333]">
-                    {formatCents(o.amountTotalCents)}
-                  </td>
-                  <td className="px-4 py-2">
+                <TableRow key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                  <TableCell>{formatDate(o.createdAt)}</TableCell>
+                  <TableCell>{o.customerEmail ?? "—"}</TableCell>
+                  <TableCell>{o.items.length}</TableCell>
+                  <TableCell>{formatCents(o.amountTotalCents)}</TableCell>
+                  <TableCell>
                     <PaymentBadge status={o.status} />
-                  </td>
-                  <td className="px-4 py-2">
+                  </TableCell>
+                  <TableCell>
                     <FulfillmentBadge status={o.fulfillmentStatus} />
-                  </td>
-                  <td className="px-4 py-2">
+                  </TableCell>
+                  <TableCell>
                     <Link
                       to="/admin/orders/$orderId"
                       params={{ orderId: o.id }}
@@ -234,11 +232,11 @@ function AdminOrdersPage() {
                     >
                       View
                     </Link>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
 

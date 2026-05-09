@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -131,11 +133,10 @@ function ProductEditPage() {
           <h3 className="mb-4 font-heading text-[#333] text-sm tracking-wider">PRODUCT DETAILS</h3>
           <form onSubmit={handleSave} className="space-y-4">
             <Field label="Name" error={errors.name}>
-              <input
+              <Input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
             </Field>
 
@@ -149,13 +150,12 @@ function ProductEditPage() {
             </Field>
 
             <Field label="Price (USD)" error={errors.priceCents}>
-              <input
+              <Input
                 type="number"
                 step="0.01"
                 min="0.01"
                 value={form.priceDollars}
                 onChange={(e) => setForm((p) => ({ ...p, priceDollars: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
               />
               {product.priceCents !== Math.round(parseFloat(form.priceDollars) * 100) &&
                 !isNaN(parseFloat(form.priceDollars)) && (
@@ -181,8 +181,11 @@ function ProductEditPage() {
                   setForm((p) => ({ ...p, category: value as "tshirt" | "sweatshirt" }))
                 }
               >
-                <SelectTrigger className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none">
-                  <SelectValue />
+                <SelectTrigger asChild>
+                  <Button variant="outline">
+                    <SelectValue />
+                    <ChevronDown className="size-4" />
+                  </Button>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="tshirt">T-Shirt</SelectItem>
@@ -255,7 +258,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="mb-1 block text-[#999] text-xs uppercase tracking-wider">{label}</p>
+      <p className="mb-1 block text-[#999] text-xs tracking-wider">{label}</p>
       {children}
       {error && <p className="mt-1 text-red-600 text-xs">{error}</p>}
     </div>
