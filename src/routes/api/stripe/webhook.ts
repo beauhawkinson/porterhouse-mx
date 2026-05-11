@@ -32,6 +32,7 @@ export const Route = createFileRoute("/api/stripe/webhook")({
           switch (event.type) {
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
+
               const orderInternalId = session.metadata?.orderInternalId;
 
               if (!orderInternalId) {
@@ -51,17 +52,8 @@ export const Route = createFileRoute("/api/stripe/webhook")({
               // Idempotency: skip if already paid
               if (existing.status === "paid") break;
 
-              const shippingDetails = session.shipping_details;
-              const shippingAddress = shippingDetails?.address
-                ? {
-                    line1: shippingDetails.address.line1 ?? "",
-                    line2: shippingDetails.address.line2 ?? null,
-                    city: shippingDetails.address.city ?? "",
-                    state: shippingDetails.address.state ?? "",
-                    postal: shippingDetails.address.postal_code ?? "",
-                    country: shippingDetails.address.country ?? "",
-                  }
-                : null;
+              const shippingDetails =
+                session.collected_information?.shipping_details ?? session.shipping_details;
 
               await db.transaction(async (tx) => {
                 await tx
@@ -74,7 +66,7 @@ export const Route = createFileRoute("/api/stripe/webhook")({
                         : (session.payment_intent?.id ?? null),
                     customerEmail: session.customer_details?.email ?? null,
                     shippingName: shippingDetails?.name ?? null,
-                    shippingAddress,
+                    shippingAddress: shippingDetails?.address ?? null,
                     amountTotalCents: session.amount_total,
                     currency: session.currency,
                     updatedAt: new Date(),

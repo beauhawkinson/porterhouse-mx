@@ -244,7 +244,7 @@ function OrderDetailPage() {
                       order.shippingName,
                       order.shippingAddress.line1,
                       order.shippingAddress.line2,
-                      `${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal}`,
+                      `${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}`,
                       order.shippingAddress.country,
                     ]
                       .filter(Boolean)
@@ -263,7 +263,7 @@ function OrderDetailPage() {
                     </>
                   )}
                   {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                  {order.shippingAddress.postal}
+                  {order.shippingAddress.postal_code}
                   <br />
                   {order.shippingAddress.country}
                 </address>

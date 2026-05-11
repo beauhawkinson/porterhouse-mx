@@ -31,8 +31,6 @@ function formatDate(date: string | Date | null) {
 function AdminDashboard() {
   const { fulfillmentCounts, totalRevenueCents, recentOrders } = Route.useLoaderData();
 
-  console.log({ fulfillmentCounts, totalRevenueCents, recentOrders });
-
   return (
     <div className="space-y-8">
       {/* Stats row */}

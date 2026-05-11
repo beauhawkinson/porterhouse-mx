@@ -145,7 +145,9 @@ export const updateFulfillmentFn = createServerFn({ method: "POST" })
   });
 
 export const updateOrderNotesFn = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => z.object({ orderId: z.string().uuid(), notes: z.string() }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ orderId: z.string().uuid(), notes: z.string() }).parse(data),
+  )
   .handler(async ({ data }) => {
     await requireAdmin(getRequest());
 

@@ -102,12 +102,12 @@ export const productVariant = pgTable(
 // ─── Orders ──────────────────────────────────────────────────────────────────
 
 export type ShippingAddress = {
-  line1: string;
+  line1: string | null;
   line2: string | null;
-  city: string;
-  state: string;
-  postal: string;
-  country: string;
+  city: string | null;
+  state: string | null;
+  postal_code: string | null;
+  country: string | null;
 };
 
 export const order = pgTable("order", {

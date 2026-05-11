@@ -54,6 +54,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         userId: data.userId ?? null,
         stripeCheckoutSessionId: `pending_${crypto.randomUUID()}`,
         status: "pending",
+        currency: "usd",
+        customerEmail: data.customerEmail ?? null,
       })
       .returning();
 
@@ -123,6 +125,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         },
       ],
       metadata: { orderInternalId: newOrder.id },
+      payment_intent_data: { metadata: { orderInternalId: newOrder.id } },
       success_url: `${baseUrl}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/cart`,
     };
@@ -136,6 +139,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const session = await stripeClient.checkout.sessions.create(sessionParams);
 
     // Update the order with the real Stripe session ID
+    // (everything else gets populated later by the webhook)
     await db
       .update(order)
       .set({ stripeCheckoutSessionId: session.id })

@@ -126,7 +126,7 @@ function SuccessPage() {
                 </>
               )}
               {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-              {order.shippingAddress.postal}
+              {order.shippingAddress.postal_code}
               <br />
               {order.shippingAddress.country}
             </address>
