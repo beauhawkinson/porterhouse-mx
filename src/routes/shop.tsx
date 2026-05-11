@@ -1,11 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { ProductCard } from "@/components/products/ProductCard";
+import { categoryEnum } from "@/lib/db/schema";
+import { CATEGORY_LABELS_PLURAL } from "@/lib/products/category";
+import { hasStock } from "@/lib/products/stock";
 import { getProducts } from "@/lib/server/products";
 
+import type { Category } from "@/lib/db/schema";
+
 const searchSchema = z.object({
-  category: z.enum(["tshirt", "sweatshirt"]).optional(),
+  category: z.enum(categoryEnum.enumValues).optional(),
 });
 
 export const Route = createFileRoute("/shop")({
@@ -16,23 +21,43 @@ export const Route = createFileRoute("/shop")({
 
 function ShopPage() {
   const products = Route.useLoaderData();
+  const { category } = Route.useSearch();
+
+  const filtered = category ? products.filter((p) => p.category === category) : products;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
       {/* Header */}
-      <div className="relative mb-12">
-        <h1 className="mb-2 font-heading text-5xl text-[#111]">The Shop</h1>
-        <p className="text-[#666] text-base">{products.length} products</p>
+      <div className="relative mb-8">
+        <h1 className="mb-2 font-heading text-3xl text-[#111] sm:text-5xl">The Shop</h1>
+        <p className="text-[#666] text-base">
+          {filtered.length} {filtered.length === 1 ? "product" : "products"}
+          {category && ` in ${CATEGORY_LABELS_PLURAL[category]}`}
+        </p>
       </div>
 
+      {/* Category filter */}
+      <nav aria-label="Filter by category" className="mb-12 flex flex-wrap gap-2">
+        <FilterPill to="/shop" search={{}} active={!category} label="All" />
+        {categoryEnum.enumValues.map((c) => (
+          <FilterPill
+            key={c}
+            to="/shop"
+            search={{ category: c }}
+            active={category === c}
+            label={CATEGORY_LABELS_PLURAL[c]}
+          />
+        ))}
+      </nav>
+
       {/* Grid */}
-      {products.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="py-24 text-center text-[#999]">
           <p className="font-heading text-2xl">No Products Found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((p) => (
+        <div className="grid max-w-3xl grid-cols-1 gap-12">
+          {filtered.map((p) => (
             <ProductCard
               key={p.id}
               slug={p.slug}
@@ -40,11 +65,38 @@ function ShopPage() {
               priceCents={p.priceCents}
               imageUrl={p.imageUrl}
               category={p.category}
-              hasStock={p.variants.some((v) => v.stock > 0)}
+              hasStock={hasStock(p)}
+              images={p.images}
             />
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+function FilterPill({
+  to,
+  search,
+  active,
+  label,
+}: {
+  to: string;
+  search: { category?: Category };
+  active: boolean;
+  label: string;
+}) {
+  return (
+    <Link
+      to={to}
+      search={search}
+      className={`border px-4 py-2 font-medium text-sm uppercase tracking-wider transition-colors ${
+        active
+          ? "border-[#111] bg-[#111] text-white"
+          : "border-[#ddd] text-[#555] hover:border-[#111] hover:text-[#111]"
+      }`}
+    >
+      {label}
+    </Link>
   );
 }

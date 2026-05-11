@@ -5,7 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
-import { order, orderItem, productVariant } from "@/lib/db/schema";
+import { order, orderItem, product, productVariant } from "@/lib/db/schema";
 
 import type Stripe from "stripe";
 
@@ -73,18 +73,30 @@ export const Route = createFileRoute("/api/stripe/webhook")({
                   })
                   .where(eq(order.id, orderInternalId));
 
-                // Decrement stock for each order item (GREATEST prevents negative stock)
+                // Decrement stock for each order item.
+                // - Variant-keyed items (apparel) decrement productVariant.stock
+                // - Variant-less items (stickers) decrement product.stock
+                // GREATEST prevents stock from going negative.
                 const items = await tx.query.orderItem.findMany({
                   where: eq(orderItem.orderId, orderInternalId),
                 });
 
                 for (const item of items) {
-                  await tx
-                    .update(productVariant)
-                    .set({
-                      stock: sql`GREATEST(0, ${productVariant.stock} - ${item.quantity})`,
-                    })
-                    .where(eq(productVariant.id, item.variantId));
+                  if (item.variantId) {
+                    await tx
+                      .update(productVariant)
+                      .set({
+                        stock: sql`GREATEST(0, ${productVariant.stock} - ${item.quantity})`,
+                      })
+                      .where(eq(productVariant.id, item.variantId));
+                  } else {
+                    await tx
+                      .update(product)
+                      .set({
+                        stock: sql`GREATEST(0, ${product.stock} - ${item.quantity})`,
+                      })
+                      .where(eq(product.id, item.productId));
+                  }
                 }
               });
 

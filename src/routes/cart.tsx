@@ -5,7 +5,7 @@ import { CartItemRow } from "@/components/cart/CartItem";
 import { Splatter } from "@/components/splatter";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
-import { useCartStore } from "@/lib/cart/store";
+import { cartKey, useCartStore } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/server/checkout";
 
 export const Route = createFileRoute("/cart")({
@@ -32,7 +32,11 @@ function CartPage() {
 
       const result = await createCheckoutSession({
         data: {
-          lines: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+          lines: items.map((i) => ({
+            productId: i.productId,
+            variantId: i.variantId,
+            quantity: i.quantity,
+          })),
           userId: session?.user?.id,
           ...(stripeCustomerId ? { stripeCustomerId } : {}),
           customerEmail: session?.user?.email ?? undefined,
@@ -66,7 +70,7 @@ function CartPage() {
         {/* Line items */}
         <div className="lg:col-span-2">
           {items.map((item) => (
-            <CartItemRow key={item.variantId} item={item} />
+            <CartItemRow key={cartKey(item)} item={item} />
           ))}
         </div>
 

@@ -44,7 +44,7 @@ function RootDocument({ children }: PropsWithChildren) {
       </head>
       <body className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex flex-1 flex-col pt-16">{children}</main>
+        <main className="flex flex-1 flex-col py-16">{children}</main>
         <Footer />
         <Scripts />
       </body>

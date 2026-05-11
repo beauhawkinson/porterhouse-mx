@@ -8,14 +8,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Brusch Script";
-  src: url("/fonts/brusch-script.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 body {
   @apply m-0;
   font-family: var(--font-body);
@@ -27,7 +19,6 @@ body {
   --font-heading: "Anton", sans-serif;
   --font-body:
     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
-  --font-porterhouse_mx: "Brusch Script", cursive;
   --font-moto_is_life: "Fave Script Pro", cursive;
 
   --background: oklch(1 0 0);
@@ -42,20 +33,12 @@ body {
   --primary: oklch(0.512 0.0897 62.2);
   --primary-foreground: oklch(1 0 0);
 
-  /* Mud palette */
-  --color-mud-darkest: #3e2a1e;
-  --color-mud-dark: #6b4423;
-  --color-mud: #8b5a2b; /* same as primary */
-  --color-mud-light: #c49a6c;
-  --color-cream: #fafaf7;
-
   --radius: 0.5rem;
 }
 
 @theme inline {
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
-  --font-porterhouse_mx: var(--font-porterhouse_mx);
   --font-moto_is_life: var(--font-moto_is_life);
 
   --color-background: var(--background);
@@ -69,12 +52,6 @@ body {
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
-  --color-mud-darkest: var(--color-mud-darkest);
-  --color-mud-dark: var(--color-mud-dark);
-  --color-mud: var(--color-mud);
-  --color-mud-light: var(--color-mud-light);
-  --color-cream: var(--color-cream);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

@@ -5,7 +5,8 @@ import { z } from "zod";
 
 import { stripeClient } from "@/lib/config/stripe.config";
 import { db } from "@/lib/db/db";
-import { order, product, productVariant } from "@/lib/db/schema";
+import { categoryEnum, order, product, productVariant } from "@/lib/db/schema";
+import { totalStock } from "@/lib/products/stock";
 import { checkIsAdmin, requireAdmin } from "@/lib/server/admin-guard";
 
 // ─── Auth check (used by navbar / root route) ────────────────────────────────
@@ -42,15 +43,10 @@ export const listOrdersFn = createServerFn({ method: "GET" })
     const conditions = [];
 
     if (data.paymentStatus !== "all") {
-      conditions.push(eq(order.status, data.paymentStatus as "pending" | "paid" | "refunded"));
+      conditions.push(eq(order.status, data.paymentStatus));
     }
     if (data.fulfillmentStatus !== "all") {
-      conditions.push(
-        eq(
-          order.fulfillmentStatus,
-          data.fulfillmentStatus as "unfulfilled" | "fulfilled" | "shipped",
-        ),
-      );
+      conditions.push(eq(order.fulfillmentStatus, data.fulfillmentStatus));
     }
     if (data.searchEmail) {
       conditions.push(ilike(order.customerEmail, `%${data.searchEmail}%`));
@@ -203,9 +199,11 @@ export const listAdminProductsFn = createServerFn({ method: "GET" }).handler(asy
     orderBy: [asc(product.createdAt)],
   });
 
+  // totalStock handles both variant-keyed (sums variants) and variant-less
+  // (uses product.stock) products. Stickers were reporting 0 before this.
   return products.map((p) => ({
     ...p,
-    totalStock: p.variants.reduce((s, v) => s + v.stock, 0),
+    totalStock: totalStock(p),
   }));
 });
 
@@ -228,7 +226,7 @@ const updateProductSchema = z.object({
   description: z.string().min(1),
   priceCents: z.number().int().min(1),
   imageUrl: z.string().min(1),
-  category: z.enum(["tshirt", "sweatshirt"]),
+  category: z.enum(categoryEnum.enumValues),
 });
 
 export const updateProductFn = createServerFn({ method: "POST" })
@@ -286,6 +284,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
     return updated ?? null;
   });
 
+// Restock a product variant (apparel sizes).
 const updateVariantStockSchema = z.object({
   variantId: z.string().uuid(),
   stock: z.number().int().min(0),
@@ -300,6 +299,27 @@ export const updateVariantStockFn = createServerFn({ method: "POST" })
       .update(productVariant)
       .set({ stock: data.stock })
       .where(eq(productVariant.id, data.variantId))
+      .returning();
+
+    return updated ?? null;
+  });
+
+// Restock a variant-less product (stickers). Parallel to updateVariantStockFn
+// but writes to product.stock instead of productVariant.stock.
+const updateProductStockSchema = z.object({
+  productId: z.string().uuid(),
+  stock: z.number().int().min(0),
+});
+
+export const updateProductStockFn = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => updateProductStockSchema.parse(data))
+  .handler(async ({ data }) => {
+    await requireAdmin(getRequest());
+
+    const [updated] = await db
+      .update(product)
+      .set({ stock: data.stock, updatedAt: new Date() })
+      .where(eq(product.id, data.productId))
       .returning();
 
     return updated ?? null;

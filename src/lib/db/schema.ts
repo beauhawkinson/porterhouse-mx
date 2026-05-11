@@ -65,10 +65,13 @@ export const verification = pgTable("verification", {
 
 // ─── Store enums ─────────────────────────────────────────────────────────────
 
-export const categoryEnum = pgEnum("category", ["tshirt", "sweatshirt"]);
+export const categoryEnum = pgEnum("category", ["tshirt", "sweatshirt", "sticker"]);
 export const sizeEnum = pgEnum("size", ["S", "M", "L", "XL", "XXL"]);
 export const orderStatusEnum = pgEnum("order_status", ["pending", "paid", "fulfilled", "refunded"]);
 
+export type Category = (typeof categoryEnum.enumValues)[number];
+export type Size = (typeof sizeEnum.enumValues)[number];
+export type OrderStatus = (typeof orderStatusEnum.enumValues)[number];
 // ─── Products ────────────────────────────────────────────────────────────────
 
 export const product = pgTable("product", {
@@ -81,6 +84,9 @@ export const product = pgTable("product", {
   category: categoryEnum("category").notNull(),
   stripeProductId: text("stripe_product_id"),
   stripePriceId: text("stripe_price_id"),
+  // Used for variant-less products (e.g. stickers). For products with variants,
+  // stock is tracked per-variant on product_variant.stock and this stays at 0.
+  stock: integer("stock").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -97,6 +103,21 @@ export const productVariant = pgTable(
     stripePriceId: text("stripe_price_id"),
   },
   (t) => [unique().on(t.productId, t.size)],
+);
+
+export const productImage = pgTable(
+  "product_image",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    alt: text("alt"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.productId, t.sortOrder)],
 );
 
 // ─── Orders ──────────────────────────────────────────────────────────────────
@@ -143,11 +164,11 @@ export const orderItem = pgTable("order_item", {
   productId: uuid("product_id")
     .notNull()
     .references(() => product.id),
-  variantId: uuid("variant_id")
-    .notNull()
-    .references(() => productVariant.id),
+  // Nullable: variant-less products (stickers) won't have a variantId.
+  variantId: uuid("variant_id").references(() => productVariant.id),
   nameSnapshot: text("name_snapshot").notNull(),
-  sizeSnapshot: text("size_snapshot").notNull(),
+  // Nullable for variant-less products.
+  sizeSnapshot: text("size_snapshot"),
   priceCentsSnapshot: integer("price_cents_snapshot").notNull(),
   quantity: integer("quantity").notNull(),
 });

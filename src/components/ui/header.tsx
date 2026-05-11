@@ -12,7 +12,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border border-b bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-3 items-center px-4 sm:px-6">
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-2 items-center px-8 sm:px-6 md:grid-cols-3">
         {/* Left: logo */}
         <Link
           to="/"

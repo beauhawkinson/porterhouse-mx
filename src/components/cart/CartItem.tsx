@@ -1,4 +1,4 @@
-import { useCartStore } from "@/lib/cart/store";
+import { cartKey, useCartStore } from "@/lib/cart/store";
 
 import type { CartItem as CartItemType } from "@/lib/cart/store";
 
@@ -8,6 +8,8 @@ type Props = {
 
 export function CartItemRow({ item }: Props) {
   const { removeItem, updateQuantity } = useCartStore();
+  const key = cartKey(item);
+
   const price = (item.priceCents / 100).toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
@@ -25,14 +27,14 @@ export function CartItemRow({ item }: Props) {
 
       <div className="min-w-0 flex-1">
         <h3 className="truncate font-heading text-base tracking-wide">{item.name}</h3>
-        <p className="mt-0.5 text-[#666] text-sm">Size: {item.size}</p>
+        {item.size && <p className="mt-0.5 text-[#666] text-sm">Size: {item.size}</p>}
         <p className="mt-0.5 text-[#999] text-sm">{price} each</p>
 
         <div className="mt-3 flex items-center gap-3">
           <div className="flex items-center border border-[#ddd]">
             <button
               type="button"
-              onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+              onClick={() => updateQuantity(key, item.quantity - 1)}
               className="flex h-8 w-8 cursor-pointer items-center justify-center text-[#555] transition-colors hover:bg-[#f5f0eb]"
               aria-label="Decrease quantity"
             >
@@ -41,7 +43,7 @@ export function CartItemRow({ item }: Props) {
             <span className="w-10 text-center font-medium text-sm">{item.quantity}</span>
             <button
               type="button"
-              onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+              onClick={() => updateQuantity(key, item.quantity + 1)}
               className="flex h-8 w-8 cursor-pointer items-center justify-center text-[#555] transition-colors hover:bg-[#f5f0eb]"
               aria-label="Increase quantity"
             >
@@ -50,7 +52,7 @@ export function CartItemRow({ item }: Props) {
           </div>
           <button
             type="button"
-            onClick={() => removeItem(item.variantId)}
+            onClick={() => removeItem(key)}
             className="cursor-pointer text-[#999] text-xs underline transition-colors hover:text-[#3E2A1E]"
           >
             Remove

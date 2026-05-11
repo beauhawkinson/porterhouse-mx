@@ -12,12 +12,8 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/orders/success")({
   validateSearch: searchSchema,
-  loader: ({ location: { search } }) => {
-    const result = searchSchema.safeParse(search);
-    const sessionId = result.success ? result.data.session_id : undefined;
-    if (!sessionId) return null;
-    return getOrderBySessionId({ data: sessionId });
-  },
+  loaderDeps: ({ search }) => ({ sessionId: search.session_id }),
+  loader: ({ deps: { sessionId } }) => getOrderBySessionId({ data: sessionId }),
   component: SuccessPage,
 });
 
@@ -39,6 +35,8 @@ function SuccessPage() {
       </div>
     );
   }
+
+  const currency = order.currency?.toUpperCase() ?? "USD";
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
@@ -71,17 +69,17 @@ function SuccessPage() {
               <p className="text-[#333]">{order.customerEmail}</p>
             </div>
           )}
-          {/* {order.amountTotalCents && (
+          {order.amountTotalCents !== null && (
             <div>
               <p className="mb-1 text-[#999] text-xs tracking-wider">Total Paid</p>
               <p className="font-semibold text-[#3E2A1E]">
                 {(order.amountTotalCents / 100).toLocaleString("en-US", {
                   style: "currency",
-                  currency: order.currency?.to() ?? "USD",
+                  currency,
                 })}
               </p>
             </div>
-          )} */}
+          )}
           <div>
             <p className="mb-1 text-[#999] text-xs tracking-wider">Status</p>
             <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs tracking-wider">
@@ -95,14 +93,16 @@ function SuccessPage() {
           <p className="mb-3 font-heading text-[#333] text-sm tracking-wider">ITEMS</p>
           <ul className="space-y-3">
             {order.items.map((item) => (
-              <li key={item.id} className="flex justify-between text-sm">
-                <span className="text-[#333]">
-                  {item.nameSnapshot} — Size {item.sizeSnapshot} × {item.quantity}
+              <li key={item.id} className="flex justify-between gap-4 text-sm">
+                <span className="min-w-0 text-[#333]">
+                  {item.nameSnapshot}
+                  {item.sizeSnapshot && ` — Size ${item.sizeSnapshot}`}
+                  {` × ${item.quantity}`}
                 </span>
-                <span className="font-medium text-[#111]">
+                <span className="shrink-0 font-medium text-[#111]">
                   {((item.priceCentsSnapshot * item.quantity) / 100).toLocaleString("en-US", {
                     style: "currency",
-                    currency: "USD",
+                    currency,
                   })}
                 </span>
               </li>

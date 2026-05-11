@@ -5,12 +5,16 @@ import { z } from "zod";
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
-import { order, orderItem, productVariant } from "@/lib/db/schema";
+import { order, orderItem, product, productVariant } from "@/lib/db/schema";
 
 import type Stripe from "stripe";
 
+// A cart line is either variant-keyed (apparel) or product-keyed (stickers).
+// We require productId on every line so the server can resolve both cases
+// without a second lookup, and variantId is optional.
 const cartLineSchema = z.object({
-  variantId: z.string().uuid(),
+  productId: z.string().uuid(),
+  variantId: z.string().uuid().nullable(),
   quantity: z.number().int().min(1),
 });
 
@@ -24,26 +28,53 @@ const checkoutInputSchema = z.object({
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => checkoutInputSchema.parse(data))
   .handler(async ({ data }) => {
-    const variantIds = data.lines.map((l) => l.variantId);
+    // Partition lines by whether they reference a variant.
+    const variantIds = data.lines.map((l) => l.variantId).filter((id): id is string => id !== null);
+    const productIdsWithoutVariant = data.lines
+      .filter((l) => l.variantId === null)
+      .map((l) => l.productId);
 
-    // Load variants with their parent products
-    const variants = await db.query.productVariant.findMany({
-      where: inArray(productVariant.id, variantIds),
-      with: { product: true },
-    });
+    // Load variants (with their parent products) for variant-keyed lines.
+    const variants =
+      variantIds.length > 0
+        ? await db.query.productVariant.findMany({
+            where: inArray(productVariant.id, variantIds),
+            with: { product: true },
+          })
+        : [];
 
+    // Load standalone products for variant-less lines (stickers).
+    const products =
+      productIdsWithoutVariant.length > 0
+        ? await db.query.product.findMany({
+            where: inArray(product.id, productIdsWithoutVariant),
+          })
+        : [];
+
+    // Verify everything resolved.
     if (variants.length !== variantIds.length) {
+      throw new Error("One or more product variants not found.");
+    }
+    if (products.length !== productIdsWithoutVariant.length) {
       throw new Error("One or more products not found.");
     }
 
-    // Validate stock
+    // Validate stock for every line.
     for (const line of data.lines) {
-      const variant = variants.find((v) => v.id === line.variantId);
-      if (!variant) throw new Error(`Variant ${line.variantId} not found.`);
-      if (variant.stock < line.quantity) {
-        throw new Error(
-          `Not enough stock for ${variant.product.name} (${variant.size}). Only ${variant.stock} left.`,
-        );
+      if (line.variantId) {
+        const variant = variants.find((v) => v.id === line.variantId);
+        if (!variant) throw new Error(`Variant ${line.variantId} not found.`);
+        if (variant.stock < line.quantity) {
+          throw new Error(
+            `Not enough stock for ${variant.product.name} (${variant.size}). Only ${variant.stock} left.`,
+          );
+        }
+      } else {
+        const p = products.find((x) => x.id === line.productId);
+        if (!p) throw new Error(`Product ${line.productId} not found.`);
+        if (p.stock < line.quantity) {
+          throw new Error(`Not enough stock for ${p.name}. Only ${p.stock} left.`);
+        }
       }
     }
 
@@ -61,42 +92,70 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     if (!newOrder) throw new Error("Failed to create order.");
 
-    // Insert order items
+    // Insert order items — branched by line type.
     await db.insert(orderItem).values(
       data.lines.map((line) => {
-        const variant = variants.find((v) => v.id === line.variantId)!;
+        if (line.variantId) {
+          const variant = variants.find((v) => v.id === line.variantId)!;
+          return {
+            orderId: newOrder.id,
+            productId: variant.productId,
+            variantId: variant.id,
+            nameSnapshot: variant.product.name,
+            sizeSnapshot: variant.size,
+            priceCentsSnapshot: variant.product.priceCents,
+            quantity: line.quantity,
+          };
+        }
+        const p = products.find((x) => x.id === line.productId)!;
         return {
           orderId: newOrder.id,
-          productId: variant.productId,
-          variantId: variant.id,
-          nameSnapshot: variant.product.name,
-          sizeSnapshot: variant.size,
-          priceCentsSnapshot: variant.product.priceCents,
+          productId: p.id,
+          variantId: null,
+          nameSnapshot: p.name,
+          sizeSnapshot: null,
+          priceCentsSnapshot: p.priceCents,
           quantity: line.quantity,
         };
       }),
     );
 
-    // Build Stripe line items
+    // Build Stripe line items.
     const lineItems = data.lines.map((line) => {
-      const variant = variants.find((v) => v.id === line.variantId)!;
-      const priceId = variant.stripePriceId ?? variant.product.stripePriceId;
+      if (line.variantId) {
+        const variant = variants.find((v) => v.id === line.variantId)!;
+        const priceId = variant.stripePriceId ?? variant.product.stripePriceId;
 
-      if (priceId) {
+        if (priceId) {
+          return { price: priceId, quantity: line.quantity };
+        }
+
         return {
-          price: priceId,
+          price_data: {
+            currency: "usd",
+            unit_amount: variant.product.priceCents,
+            product_data: {
+              name: `${variant.product.name} — Size ${variant.size}`,
+              images: variant.product.imageUrl.startsWith("http") ? [variant.product.imageUrl] : [],
+            },
+          },
           quantity: line.quantity,
         };
       }
 
-      // Fallback: price_data
+      // Variant-less (sticker)
+      const p = products.find((x) => x.id === line.productId)!;
+      if (p.stripePriceId) {
+        return { price: p.stripePriceId, quantity: line.quantity };
+      }
+
       return {
         price_data: {
           currency: "usd",
-          unit_amount: variant.product.priceCents,
+          unit_amount: p.priceCents,
           product_data: {
-            name: `${variant.product.name} — Size ${variant.size}`,
-            images: variant.product.imageUrl.startsWith("http") ? [variant.product.imageUrl] : [],
+            name: p.name,
+            images: p.imageUrl.startsWith("http") ? [p.imageUrl] : [],
           },
         },
         quantity: line.quantity,
@@ -105,7 +164,6 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     const baseUrl = env.BETTER_AUTH_URL;
 
-    // Build session params
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       line_items: lineItems,
@@ -138,8 +196,6 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     const session = await stripeClient.checkout.sessions.create(sessionParams);
 
-    // Update the order with the real Stripe session ID
-    // (everything else gets populated later by the webhook)
     await db
       .update(order)
       .set({ stripeCheckoutSessionId: session.id })

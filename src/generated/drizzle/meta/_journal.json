@@ -15,6 +15,27 @@
       "when": 1778275004126,
       "tag": "0001_yummy_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778523522479,
+      "tag": "0002_cloudy_catseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778531093070,
+      "tag": "0003_complete_golden_guardian",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778533424551,
+      "tag": "0004_square_morbius",
+      "breakpoints": true
     }
   ]
 }
