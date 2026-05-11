@@ -71,7 +71,7 @@ function SuccessPage() {
               <p className="text-[#333]">{order.customerEmail}</p>
             </div>
           )}
-          {order.amountTotalCents && (
+          {/* {order.amountTotalCents && (
             <div>
               <p className="mb-1 text-[#999] text-xs tracking-wider">Total Paid</p>
               <p className="font-semibold text-[#3E2A1E]">
@@ -81,7 +81,7 @@ function SuccessPage() {
                 })}
               </p>
             </div>
-          )}
+          )} */}
           <div>
             <p className="mb-1 text-[#999] text-xs tracking-wider">Status</p>
             <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs tracking-wider">

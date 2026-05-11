@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
-import { Button } from "./Button";
+import { Button } from "@/components/ui/button";
 
 import type * as React from "react";
 
@@ -48,7 +48,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={clsx(
-          "fixed z-50 grid gap-4 border bg-background custom:bg-surface shadow-lg outline-none",
+          "fixed z-50 grid gap-4 border bg-background shadow-lg outline-none",
           "data-[state=closed]:animate-out data-[state=open]:animate-in",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

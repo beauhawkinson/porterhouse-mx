@@ -78,7 +78,7 @@ function ProductDetailPage() {
 
         {/* Details */}
         <div className="flex flex-col">
-          <span className="mb-2 font-medium text-[#8B5A2B] text-xs tracking-[0.3em]">
+          <span className="mb-2 font-medium text-primary text-xs tracking-[0.3em]">
             {product.category === "tshirt" ? "T-Shirt" : "Sweatshirt"}
           </span>
           <h1 className="mb-4 font-heading text-4xl text-[#111] leading-none sm:text-5xl">
@@ -106,9 +106,7 @@ function ProductDetailPage() {
 
           {/* Stock note */}
           {selectedVariant && selectedVariant.stock <= 5 && selectedVariant.stock > 0 && (
-            <p className="mb-4 text-[#8B5A2B] text-sm">
-              Only {selectedVariant.stock} left in stock!
-            </p>
+            <p className="mb-4 text-primary text-sm">Only {selectedVariant.stock} left in stock!</p>
           )}
 
           {/* Add to cart */}

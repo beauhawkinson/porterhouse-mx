@@ -24,17 +24,13 @@ body {
 }
 
 :root {
-  --radius: 0.5rem;
-  --font-porterhouse_mx: "Brusch Script", cursive;
-  --font-moto_is_life: "Fave Script Pro", cursive;
-
   --font-heading: "Anton", sans-serif;
   --font-body:
     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+  --font-porterhouse_mx: "Brusch Script", cursive;
+  --font-moto_is_life: "Fave Script Pro", cursive;
 
-  /* Cream background — matches the mud aesthetic */
-  --background: oklch(0.985 0.003 85); /* #fafaf7 cream */
-  --surface: oklch(1 0 0);
+  --background: oklch(1 0 0);
   --muted: oklch(0.94 0.005 85);
   --border: oklch(0.88 0.01 60);
 
@@ -43,16 +39,17 @@ body {
   --muted-foreground: oklch(0.45 0.01 282);
   --faded-foreground: oklch(0.65 0.01 282);
 
-  /* Primary is mud — matte earthy brown for CTAs */
-  --primary: oklch(0.42 0.07 50);
-  --primary-foreground: oklch(0.985 0.003 85);
+  --primary: oklch(0.512 0.0897 62.2);
+  --primary-foreground: oklch(1 0 0);
 
   /* Mud palette */
   --color-mud-darkest: #3e2a1e;
   --color-mud-dark: #6b4423;
-  --color-mud: #8b5a2b;
+  --color-mud: #8b5a2b; /* same as primary */
   --color-mud-light: #c49a6c;
   --color-cream: #fafaf7;
+
+  --radius: 0.5rem;
 }
 
 @theme inline {
@@ -62,7 +59,6 @@ body {
   --font-moto_is_life: var(--font-moto_is_life);
 
   --color-background: var(--background);
-  --color-surface: var(--surface);
   --color-muted: var(--muted);
   --color-border: var(--border);
 

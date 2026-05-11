@@ -47,12 +47,12 @@ function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 py-24 text-center">
+      <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 py-32 text-center">
         <Splatter className="mx-auto mb-6 w-24 opacity-20" color="#6B4423" />
         <h1 className="mb-4 font-heading text-4xl text-[#111]">YOUR CART IS EMPTY</h1>
         <p className="mb-8 text-[#666]">Looks like you haven't added anything yet.</p>
         <Link to="/shop">
-          <Button size="lg">SHOP NOW</Button>
+          <Button size="lg">Shop Now</Button>
         </Link>
       </div>
     );
@@ -60,7 +60,7 @@ function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="mb-10 font-heading text-4xl text-[#111]">YOUR CART</h1>
+      <h1 className="mb-10 font-heading text-4xl text-[#111]">Your Cart</h1>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
         {/* Line items */}
@@ -72,8 +72,8 @@ function CartPage() {
 
         {/* Order summary */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 border border-[#e5e0d8] bg-white p-6">
-            <h2 className="mb-6 font-heading text-[#111] text-xl">ORDER SUMMARY</h2>
+          <div className="sticky top-24 border p-6">
+            <h2 className="mb-6 font-heading text-[#111] text-xl">Order Summary</h2>
 
             <div className="mb-6 space-y-3 text-sm">
               <div className="flex justify-between">

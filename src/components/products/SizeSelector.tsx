@@ -32,7 +32,7 @@ export function SizeSelector({ variants, selectedVariantId, onSelect }: Props) {
                 ? "cursor-not-allowed border-[#e5e0d8] text-[#bbb] line-through"
                 : selectedVariantId === variant?.id
                   ? "border-[#3E2A1E] bg-[#3E2A1E] text-white"
-                  : "cursor-pointer border-[#ccc] text-[#333] hover:border-[#8B5A2B] hover:text-[#6B4423]",
+                  : "cursor-pointer border-[#ccc] text-[#333] hover:border-primary hover:text-[#6B4423]",
             ].join(" ")}
           >
             {size}

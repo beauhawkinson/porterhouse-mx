@@ -289,7 +289,7 @@ function OrderDetailPage() {
             <TimelineRow p="Shipped" value={formatDate(order.shippedAt)} />
             {order.trackingNumber && (
               <TimelineRow
-                p={`Tracking (${order.trackingCarrier?.to() ?? ""})`}
+                p={`Tracking (${order.trackingCarrier ?? ""})`}
                 value={order.trackingNumber}
               />
             )}
@@ -312,8 +312,8 @@ function OrderDetailPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {order.items.map((item) => (
-              <TableRow key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+            {order.items.map((item, i) => (
+              <TableRow key={item.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
                 <TableCell>{item.nameSnapshot}</TableCell>
                 <TableCell>{item.sizeSnapshot}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
@@ -385,7 +385,7 @@ function OrderDetailPage() {
           onBlur={handleNotesSave}
           rows={4}
           placeholder="Private notes for the owner…"
-          className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb] focus:border-[#8B5A2B] focus:outline-none"
+          className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb] focus:border-primary focus:outline-none"
         />
       </section>
     </div>

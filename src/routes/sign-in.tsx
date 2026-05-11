@@ -35,7 +35,7 @@ function SignInPage() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="flex w-full cursor-pointer items-center justify-center gap-3 border border-[#ddd] px-4 py-3 font-medium text-[#333] text-sm transition-all hover:border-[#8B5A2B] hover:text-[#6B4423]"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 border border-[#ddd] px-4 py-3 font-medium text-[#333] text-sm transition-all hover:border-primary hover:text-[#6B4423]"
           >
             <GoogleIcon />
             Continue with Google

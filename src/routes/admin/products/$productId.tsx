@@ -98,6 +98,7 @@ function ProductEditPage() {
       setTimeout(() => setSaveMsg(""), 2000);
     } catch (err) {
       setSaveMsg("Error saving. Please try again.");
+      console.error(err);
     } finally {
       setSaving(false);
     }
@@ -145,7 +146,7 @@ function ProductEditPage() {
                 value={form.description}
                 onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                 rows={3}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-primary focus:outline-none"
               />
             </Field>
 
@@ -158,7 +159,7 @@ function ProductEditPage() {
                 onChange={(e) => setForm((p) => ({ ...p, priceDollars: e.target.value }))}
               />
               {product.priceCents !== Math.round(parseFloat(form.priceDollars) * 100) &&
-                !isNaN(parseFloat(form.priceDollars)) && (
+                !Number.isNaN(parseFloat(form.priceDollars)) && (
                   <p className="mt-1 text-amber-700 text-xs">
                     Price changed — will create a new Stripe Price and archive the old one.
                   </p>
@@ -170,7 +171,7 @@ function ProductEditPage() {
                 type="text"
                 value={form.imageUrl}
                 onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
+                className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm focus:border-primary focus:outline-none"
               />
             </Field>
 
@@ -228,7 +229,7 @@ function ProductEditPage() {
                       [v.id]: Math.max(0, parseInt(e.target.value, 10) || 0),
                     }))
                   }
-                  className="w-20 border border-[#e5e0d8] px-2 py-1.5 text-[#333] text-sm focus:border-[#8B5A2B] focus:outline-none"
+                  className="w-20 border border-[#e5e0d8] px-2 py-1.5 text-[#333] text-sm focus:border-primary focus:outline-none"
                 />
                 <button
                   type="button"

@@ -16,7 +16,7 @@ function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-[#FAFAF7]">
+      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
           <h1 className="mb-6 leading-[0.85] tracking-tight">
             <span className="block whitespace-nowrap font-moto_is_life text-[89px] text-foreground sm:text-[144px]">
@@ -38,7 +38,7 @@ function HomePage() {
       {/* ── Featured products ────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex items-end gap-4">
-          <h2 className="font-heading text-4xl text-[#111] leading-none">FEATURED GEAR</h2>
+          <h2 className="font-heading text-4xl text-[#111] leading-none">Featured Gear</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -4,8 +4,8 @@ import { app } from "@/lib/config/app.config";
 
 export function Footer() {
   return (
-    <footer className="relative mt-20 overflow-hidden border-[#e5e0d8] border-t bg-[#FAFAF7]">
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6">
+    <footer className="relative overflow-hidden border border-t bg-background">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-8 md:flex-row">
           <div>
             <p className="mb-2 font-porterhouse_mx text-2xl text-[#111] tracking-widest">

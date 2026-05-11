@@ -31,18 +31,28 @@ function formatDate(date: string | Date | null) {
 function AdminDashboard() {
   const { fulfillmentCounts, totalRevenueCents, recentOrders } = Route.useLoaderData();
 
+  console.log({ fulfillmentCounts, totalRevenueCents, recentOrders });
+
   return (
     <div className="space-y-8">
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard label="Total Revenue" value={formatCents(totalRevenueCents)} />
-        <StatCard
-          label="Unfulfilled"
-          value={String(fulfillmentCounts.unfulfilled)}
-          accent="amber"
-        />
-        <StatCard label="Fulfilled" value={String(fulfillmentCounts.fulfilled)} accent="green" />
-        <StatCard label="Shipped" value={String(fulfillmentCounts.shipped)} accent="blue" />
+        <div>
+          <p className="mb-1 text-[#999] text-xs tracking-wider">Total Revenue</p>
+          <p className="font-heading text-xs">{formatCents(totalRevenueCents)}</p>
+        </div>
+        <div>
+          <p className="mb-1 text-[#999] text-xs tracking-wider">Unfulfilled</p>
+          <p className="font-heading text-xs">{String(fulfillmentCounts.unfulfilled)}</p>
+        </div>
+        <div>
+          <p className="mb-1 text-[#999] text-xs tracking-wider">Fulfilled</p>
+          <p className="font-heading text-xs">{String(fulfillmentCounts.fulfilled)}</p>
+        </div>
+        <div>
+          <p className="mb-1 text-[#999] text-xs tracking-wider">Shipped</p>
+          <p className="font-heading text-xs">{String(fulfillmentCounts.shipped)}</p>
+        </div>
       </div>
 
       {/* Recent orders */}
@@ -100,32 +110,6 @@ function AdminDashboard() {
           </div>
         )}
       </section>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: "amber" | "green" | "blue";
-}) {
-  const accentClass =
-    accent === "amber"
-      ? "text-amber-700"
-      : accent === "green"
-        ? "text-green-700"
-        : accent === "blue"
-          ? "text-blue-700"
-          : "text-[#111]";
-
-  return (
-    <div className="rounded-lg border border-[#e5e0d8] bg-white p-2">
-      <p className="mb-1 text-[#999] text-xs tracking-wider">{label}</p>
-      <p className={`font-heading text-xs ${accentClass}`}>{value}</p>
     </div>
   );
 }

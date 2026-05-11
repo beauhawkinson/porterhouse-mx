@@ -19,10 +19,10 @@ export function ProductCard({ slug, name, priceCents, imageUrl, category, hasSto
     <Link
       to="/products/$slug"
       params={{ slug }}
-      className="group relative flex flex-col overflow-hidden border border-[#e5e0d8] bg-white transition-colors duration-200 hover:border-[#8B5A2B]"
+      className="group relative flex flex-col overflow-hidden border transition-colors duration-200 hover:border-primary"
     >
       {/* Product image */}
-      <div className="relative aspect-square overflow-hidden bg-[#f5f0eb]">
+      <div className="relative aspect-square overflow-hidden">
         <img
           src={imageUrl}
           alt={name}

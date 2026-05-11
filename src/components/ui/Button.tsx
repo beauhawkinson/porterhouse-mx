@@ -22,7 +22,7 @@ const buttonVariants = cva(
         outline:
           "focus-visible:border-primary border-border border bg-transparent text-secondary-foreground hover:bg-muted hover:text-foreground",
         secondary:
-          "bg-surface text-foreground border border-border hover:border-mud hover:text-mud-dark focus-visible:border-mud",
+          "bg-muted text-foreground border border-border hover:border-mud hover:text-mud-dark focus-visible:border-mud",
         ghost:
           "bg-transparent text-foreground border-transparent hover:text-mud-dark hover:bg-muted",
       },

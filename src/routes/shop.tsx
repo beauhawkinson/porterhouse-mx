@@ -44,7 +44,7 @@ function ShopPage() {
               filter === cat ? "bg-[#3E2A1E] text-white" : "text-[#666] hover:text-[#3E2A1E]",
             ].join(" ")}
           >
-            {cat === "all" ? "ALL" : cat === "tshirt" ? "T-SHIRTS" : "SWEATSHIRTS"}
+            {cat === "all" ? "All" : cat === "tshirt" ? "T-Shirts" : "Sweatshirts"}
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2 text-[#999] text-sm">

@@ -11,7 +11,7 @@ export function Header() {
   const { isAdmin } = useRouteContext({ from: "__root__" });
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 border-[#e5e0d8] border-b bg-[#FAFAF7]/80 backdrop-blur-sm">
+    <header className="fixed top-0 right-0 left-0 z-50 border border-b bg-background/80 backdrop-blur-sm">
       <div className="mx-auto grid h-16 max-w-7xl grid-cols-3 items-center px-4 sm:px-6">
         {/* Left: logo */}
         <Link
