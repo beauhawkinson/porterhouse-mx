@@ -304,21 +304,21 @@ export const updateVariantStockFn = createServerFn({ method: "POST" })
 
 // Restock a variant-less product (stickers). Parallel to updateVariantStockFn
 // but writes to product.stock instead of productVariant.stock.
-const updateProductStockSchema = z.object({
-  productId: z.uuid(),
-  stock: z.number().int().min(0),
-});
+// const updateProductStockSchema = z.object({
+//   productId: z.uuid(),
+//   stock: z.number().int().min(0),
+// });
 
-export const updateProductStockFn = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => updateProductStockSchema.parse(data))
-  .handler(async ({ data }) => {
-    await requireAdmin(getRequest());
+// const updateProductStockFn = createServerFn({ method: "POST" })
+//   .inputValidator((data: unknown) => updateProductStockSchema.parse(data))
+//   .handler(async ({ data }) => {
+//     await requireAdmin(getRequest());
 
-    const [updated] = await db
-      .update(product)
-      .set({ stock: data.stock, updatedAt: new Date() })
-      .where(eq(product.id, data.productId))
-      .returning();
+//     const [updated] = await db
+//       .update(product)
+//       .set({ stock: data.stock, updatedAt: new Date() })
+//       .where(eq(product.id, data.productId))
+//       .returning();
 
-    return updated ?? null;
-  });
+//     return updated ?? null;
+//   });
