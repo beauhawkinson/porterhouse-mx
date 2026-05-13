@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/cart/store";
+import { app } from "@/lib/config/app.config";
 import { getOrderBySessionId } from "@/lib/server/checkout";
 
 const searchSchema = z.object({
@@ -138,8 +139,8 @@ function SuccessPage() {
       <p className="mb-8 text-center text-[#666] text-sm">
         The owner will receive your order and ship it within 3–5 business days. You'll get a Stripe
         receipt via email. Reach out at{" "}
-        <a href="mailto:shop@jpmotorcross.com" className="underline hover:text-[#6B4423]">
-          shop@jpmotorcross.com
+        <a href={`mailto:${app.email}`} className="underline hover:text-[#6B4423]">
+          {app.email}
         </a>{" "}
         with any questions.
       </p>

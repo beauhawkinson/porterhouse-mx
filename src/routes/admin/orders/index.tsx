@@ -163,7 +163,7 @@ function AdminOrdersPage() {
               type="text"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="beau@gmail.com"
+              placeholder="rider@gmail.com"
             />
             <button
               type="submit"

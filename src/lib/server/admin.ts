@@ -88,7 +88,7 @@ export const getOrderFn = createServerFn({ method: "GET" })
   });
 
 const updateFulfillmentSchema = z.object({
-  orderId: z.string().uuid(),
+  orderId: z.uuid(),
   fulfillmentStatus: z.enum(["unfulfilled", "fulfilled", "shipped"]),
   trackingNumber: z.string().optional(),
   trackingCarrier: z.string().optional(),
@@ -141,9 +141,7 @@ export const updateFulfillmentFn = createServerFn({ method: "POST" })
   });
 
 export const updateOrderNotesFn = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) =>
-    z.object({ orderId: z.string().uuid(), notes: z.string() }).parse(data),
-  )
+  .inputValidator((data: unknown) => z.object({ orderId: z.uuid(), notes: z.string() }).parse(data))
   .handler(async ({ data }) => {
     await requireAdmin(getRequest());
 
@@ -221,7 +219,7 @@ export const getAdminProductFn = createServerFn({ method: "GET" })
   });
 
 const updateProductSchema = z.object({
-  productId: z.string().uuid(),
+  productId: z.uuid(),
   name: z.string().min(1),
   description: z.string().min(1),
   priceCents: z.number().int().min(1),
@@ -286,7 +284,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
 
 // Restock a product variant (apparel sizes).
 const updateVariantStockSchema = z.object({
-  variantId: z.string().uuid(),
+  variantId: z.uuid(),
   stock: z.number().int().min(0),
 });
 
@@ -307,7 +305,7 @@ export const updateVariantStockFn = createServerFn({ method: "POST" })
 // Restock a variant-less product (stickers). Parallel to updateVariantStockFn
 // but writes to product.stock instead of productVariant.stock.
 const updateProductStockSchema = z.object({
-  productId: z.string().uuid(),
+  productId: z.uuid(),
   stock: z.number().int().min(0),
 });
 

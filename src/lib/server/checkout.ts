@@ -13,8 +13,8 @@ import type Stripe from "stripe";
 // We require productId on every line so the server can resolve both cases
 // without a second lookup, and variantId is optional.
 const cartLineSchema = z.object({
-  productId: z.string().uuid(),
-  variantId: z.string().uuid().nullable(),
+  productId: z.uuid(),
+  variantId: z.uuid().nullable(),
   quantity: z.number().int().min(1),
 });
 

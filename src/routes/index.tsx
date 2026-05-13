@@ -35,6 +35,19 @@ function HomePage() {
         </div>
       </section>
 
+      <section className="mx-auto min-h-screen max-w-3xl px-6 py-24 text-center">
+        <h2 className="mb-8 font-moto_is_life text-5xl text-foreground leading-none sm:text-7xl">
+          About Jeremy
+        </h2>
+        <p className="text-foreground/80 text-lg leading-relaxed sm:text-xl">
+          Jeremy Porter has been chasing the next jump since he was old enough to twist a throttle.
+          What started as a kid tearing up backyard tracks turned into a relentless pursuit of every
+          starting gate he could line up behind — local hare scrambles, regional motos, and every
+          weekend in between. The bike, the dirt, the noise: it's the only place that's ever made
+          sense. This is the ride so far.
+        </p>
+      </section>
+
       <section className="mx-auto mb-32 max-w-7xl px-4 py-12 sm:px-6">
         {products.length === 0 ? (
           <div className="py-24 text-center text-[#999]">
