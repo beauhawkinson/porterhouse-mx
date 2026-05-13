@@ -40,13 +40,21 @@ export function Header() {
           )}
 
           {session ? (
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="cursor-pointer font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
-            >
-              Logout
-            </button>
+            <>
+              <Link
+                to="/account"
+                className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
+              >
+                Account
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="cursor-pointer font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               to="/sign-in"
