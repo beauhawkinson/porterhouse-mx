@@ -18,6 +18,7 @@ export function SizeSelector({ variants, selectedVariantId, onSelect }: Props) {
       {SIZES.map((size) => {
         const variant = variants.find((v) => v.size === size);
         const outOfStock = !variant || variant.stock === 0;
+        const isSelected = selectedVariantId === variant?.id;
 
         return (
           <button
@@ -25,15 +26,18 @@ export function SizeSelector({ variants, selectedVariantId, onSelect }: Props) {
             key={size}
             onClick={() => variant && !outOfStock && onSelect(variant.id)}
             disabled={outOfStock}
-            aria-pressed={selectedVariantId === variant?.id}
+            aria-pressed={isSelected}
             className={[
-              "h-10 w-14 border font-heading text-sm tracking-wider transition-all duration-150",
-              outOfStock
-                ? "cursor-not-allowed border-[#e5e0d8] text-[#bbb] line-through"
-                : selectedVariantId === variant?.id
-                  ? "border-[#3E2A1E] bg-[#3E2A1E] text-white"
-                  : "cursor-pointer border-[#ccc] text-[#333] hover:border-primary hover:text-[#6B4423]",
-            ].join(" ")}
+              "h-10 w-14 border font-heading text-sm tracking-wider",
+              "outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "disabled:cursor-not-allowed disabled:border-border disabled:text-faded-foreground disabled:line-through",
+              !outOfStock && isSelected && "border-foreground bg-foreground text-background",
+              !outOfStock &&
+                !isSelected &&
+                "cursor-pointer border-border text-foreground hover:border-foreground",
+            ]
+              .filter(Boolean)
+              .join(" ")}
           >
             {size}
           </button>

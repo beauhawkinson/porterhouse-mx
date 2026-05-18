@@ -1,8 +1,5 @@
 import clsx from "clsx";
-import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
-
-import { Button } from "@/components/ui/button";
 
 import type * as React from "react";
 
@@ -65,14 +62,14 @@ function DialogContent({
         {...props}
       >
         {children}
-        {showCloseButton && (
+        {/* {showCloseButton && (
           <DialogPrimitive.Close asChild data-slot="dialog-close">
             <Button variant="ghost" className="absolute top-2 right-2 size-6">
               <X className="icon-sm" />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>
-        )}
+        )} */}
       </DialogPrimitive.Content>
     </DialogPortal>
   );

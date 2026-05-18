@@ -1,7 +1,7 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { ProductCard } from "@/components/products/ProductCard";
-import { Button } from "@/components/ui/button";
+import Link from "@/components/ui/link";
 import { app } from "@/lib/config/app.config";
 import { hasStock } from "@/lib/products/stock";
 import { getFeaturedProducts } from "@/lib/server/products";
@@ -26,16 +26,14 @@ function HomePage() {
           </h1>
           <br />
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link to="/shop">
-              <Button size="lg" className="group w-full sm:w-auto">
-                SHOP NOW
-              </Button>
+            <Link to="/shop" size="lg" className="group w-full active:scale-[0.99] sm:w-auto">
+              SHOP NOW
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto min-h-screen max-w-3xl px-6 py-24 text-center">
+      <section className="mx-auto max-w-3xl px-6 pt-40 pb-80 text-center">
         <h2 className="mb-8 font-moto_is_life text-5xl text-foreground leading-none sm:text-7xl">
           About Jeremy
         </h2>
@@ -48,7 +46,14 @@ function HomePage() {
         </p>
       </section>
 
-      <section className="mx-auto mb-32 max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto mb-32 max-w-6xl px-4 py-12 sm:px-6">
+        <div className="mb-12 flex items-end justify-between">
+          <h2 className="font-moto_is_life text-5xl sm:text-7xl">Featured</h2>
+          <Link to="/shop" variant="section" size="none">
+            Shop all →
+          </Link>
+        </div>
+
         {products.length === 0 ? (
           <div className="py-24 text-center text-[#999]">
             <p className="font-heading text-2xl">No Products Found</p>

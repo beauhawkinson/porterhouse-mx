@@ -1,72 +1,153 @@
-import { Link, useRouteContext } from "@tanstack/react-router";
-import { ShoppingCart } from "lucide-react";
+import { useRouteContext } from "@tanstack/react-router";
+import { Menu, ShoppingCart, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import Link from "@/components/ui/link";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/cart/store";
 import { app } from "@/lib/config/app.config";
 
-export function Header() {
+const Header = () => {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
   const { isAdmin } = useRouteContext({ from: "__root__" });
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const closeMobile = () => setMobileOpen(false);
+
+  // Close the mobile menu on Escape and lock body scroll while it's open.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Allow
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMobile();
+    };
+    window.addEventListener("keydown", onKey);
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [mobileOpen]);
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 border border-b bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-2 items-center px-8 sm:px-6 md:grid-cols-3">
-        {/* Left: logo */}
-        <Link
-          to="/"
-          className="justify-self-start font-moto_is_life text-2xl text-[#111] tracking-widest transition-colors hover:text-[#6B4423]"
-        >
-          {app.brand.name}
-        </Link>
-
-        {/* Center: nav */}
-        <nav className="hidden items-center justify-center gap-8 justify-self-center md:flex">
-          <Link
-            to="/shop"
-            className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
+    <header className="fixed top-0 right-0 left-0 z-50 border-border border-b bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[auto_1fr_auto] items-center px-4 sm:px-6 md:grid-cols-3 md:px-8">
+        {/* Left: hamburger (mobile) + logo */}
+        <div className="flex items-center gap-2 justify-self-start">
+          <Button
+            variant="ghost"
+            size="icon-md"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+            className="-ml-2 md:hidden"
           >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+
+          <Link to="/" onClick={closeMobile} variant="logo" size="none">
+            {app.brand.name}
+          </Link>
+        </div>
+
+        {/* Center: nav (desktop) */}
+        <nav className="hidden items-center justify-center gap-8 justify-self-center md:flex">
+          <Link to="/shop" variant="nav" size="none">
             Shop
           </Link>
 
           {isAdmin && session && (
-            <Link
-              to="/admin"
-              className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423] [&.active]:text-[#3E2A1E]"
-            >
+            <Link to="/admin" variant="nav" size="none">
               Admin
             </Link>
           )}
 
           {session ? (
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="cursor-pointer font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
-            >
-              Logout
-            </button>
+            <>
+              <Link to="/account" variant="nav" size="none">
+                Account
+              </Link>
+
+              <Button onClick={() => signOut()} variant="nav" size="none">
+                Logout
+              </Button>
+            </>
           ) : (
-            <Link
-              to="/sign-in"
-              className="font-heading text-[#444] text-sm tracking-wider transition-colors hover:text-[#6B4423]"
-            >
+            <Link to="/sign-in" variant="nav" size="none">
               Sign In
             </Link>
           )}
         </nav>
 
         {/* Right: cart */}
-        <Link to="/cart" className="group relative justify-self-end">
+        <Link
+          to="/cart"
+          onClick={closeMobile}
+          variant="unstyled"
+          size="none"
+          className="group relative justify-self-end text-foreground hover:text-primary"
+          aria-label={`Cart${totalItems > 0 ? `, ${totalItems} item${totalItems === 1 ? "" : "s"}` : ""}`}
+        >
           <ShoppingCart />
           {totalItems > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#3E2A1E] font-bold text-white text-xs">
+            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-foreground font-bold text-background text-xs">
               {totalItems > 9 ? "9+" : totalItems}
             </span>
           )}
         </Link>
       </div>
+
+      {/* Mobile nav panel */}
+      <div
+        id="mobile-nav"
+        className={`overflow-hidden border-border border-t bg-background transition-[max-height,opacity] duration-300 ease-out md:hidden ${
+          mobileOpen ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 opacity-0"
+        }`}
+      >
+        <nav className="mx-auto flex max-w-7xl flex-col px-4 py-2 sm:px-6">
+          <Link to="/shop" onClick={closeMobile} variant="nav-mobile" size="none">
+            Shop
+          </Link>
+
+          {isAdmin && session && (
+            <Link to="/admin" onClick={closeMobile} variant="nav-mobile" size="none">
+              Admin
+            </Link>
+          )}
+
+          {session ? (
+            <>
+              <Link to="/account" onClick={closeMobile} variant="nav-mobile" size="none">
+                Account
+              </Link>
+              <Button
+                onClick={() => {
+                  closeMobile();
+                  signOut();
+                }}
+                variant="nav-mobile"
+                size="none"
+                className="text-left"
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Link to="/sign-in" onClick={closeMobile} variant="nav-mobile" size="none">
+              Sign In
+            </Link>
+          )}
+        </nav>
+      </div>
     </header>
   );
-}
+};
+
+export { Header };

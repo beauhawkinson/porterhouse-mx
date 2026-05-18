@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FulfillmentBadge, PaymentBadge } from "@/components/ui/status-badges";
 import {
   Table,
   TableBody,
@@ -28,7 +29,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getOrderFn, updateFulfillmentFn, updateOrderNotesFn } from "@/lib/server/admin";
-import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
 export const Route = createFileRoute("/admin/orders/$orderId")({
   loader: ({ params }) => getOrderFn({ data: params.orderId }),
@@ -50,6 +50,10 @@ function formatDate(date: string | Date | null | undefined) {
   });
 }
 
+// Keeps select-trigger / form-control buttons in sentence case rather than
+// inheriting the Button base uppercase.
+const formButtonClass = "normal-case tracking-normal";
+
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -60,14 +64,36 @@ function CopyButton({ value }: { value: string }) {
   }
 
   return (
-    <button
-      type="button"
-      onClick={copy}
-      className="ml-2 text-[#999] text-xs underline hover:text-[#6B4423]"
-    >
+    <Button variant="muted" size="none" onClick={copy} className="ml-2">
       {copied ? "Copied!" : "Copy"}
-    </button>
+    </Button>
   );
+}
+
+// Bordered info card pattern used throughout the page.
+function InfoCard({
+  title,
+  trailing,
+  children,
+}: {
+  title: string;
+  trailing?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="border border-border bg-background p-4">
+      <h2 className="mb-3 flex items-center font-heading text-foreground text-sm tracking-wider">
+        {title}
+        {trailing}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+// Label-style paragraph used above input fields and inside cards.
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-faded-foreground text-xs tracking-wider">{children}</p>;
 }
 
 function OrderDetailPage() {
@@ -83,8 +109,8 @@ function OrderDetailPage() {
 
   if (!order) {
     return (
-      <div className="py-16 text-center text-[#999]">
-        <p className="font-heading text-xl">ORDER NOT FOUND</p>
+      <div className="py-16 text-center text-faded-foreground">
+        <p className="font-heading text-xl tracking-wider">Order not found</p>
       </div>
     );
   }
@@ -130,14 +156,14 @@ function OrderDetailPage() {
       >
         <DialogContent side="center">
           <DialogHeader>
-            <DialogTitle>Mark as Shipped</DialogTitle>
+            <DialogTitle>Mark as shipped</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <p className="mb-1 block text-[#999] text-xs tracking-wider">Carrier</p>
+              <FieldLabel>Carrier</FieldLabel>
               <Select value={carrier} onValueChange={setCarrier}>
                 <SelectTrigger asChild>
-                  <Button variant="outline">
+                  <Button variant="outline" className={formButtonClass}>
                     <SelectValue />
                     <ChevronDown className="size-4" />
                   </Button>
@@ -151,7 +177,7 @@ function OrderDetailPage() {
               </Select>
             </div>
             <div>
-              <p className="mb-1 block text-[#999] text-xs tracking-wider">Tracking Number</p>
+              <FieldLabel>Tracking number</FieldLabel>
               <Input
                 type="text"
                 value={tracking}
@@ -181,9 +207,9 @@ function OrderDetailPage() {
       <Dialog open={showRevertConfirm} onOpenChange={setShowRevertConfirm}>
         <DialogContent side="center">
           <DialogHeader>
-            <DialogTitle>Revert to Unfulfilled</DialogTitle>
+            <DialogTitle>Revert to unfulfilled</DialogTitle>
           </DialogHeader>
-          <p className="text-[#555] text-sm">
+          <p className="text-secondary-foreground text-sm">
             This will clear the fulfillment and shipping data from the order.
           </p>
           <DialogFooter>
@@ -214,8 +240,8 @@ function OrderDetailPage() {
 
       <div className="flex items-start justify-between">
         <div>
-          <p className="mb-1 text-[#999] text-xs tracking-wider">Order ID</p>
-          <p className="break-all font-mono text-[#333] text-sm">{order.id}</p>
+          <FieldLabel>Order ID</FieldLabel>
+          <p className="break-all font-mono text-foreground text-sm">{order.id}</p>
         </div>
         <div className="flex gap-2">
           <PaymentBadge status={order.status} />
@@ -225,20 +251,19 @@ function OrderDetailPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Customer */}
-        <section className="border border-[#e5e0d8] bg-white p-4">
-          <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">CUSTOMER</h2>
+        <InfoCard title="Customer">
           <div className="space-y-2 text-sm">
             <div>
-              <p className="text-[#999] text-xs tracking-wider">Email</p>
-              <p className="text-[#333]">
+              <FieldLabel>Email</FieldLabel>
+              <p className="text-foreground">
                 {order.customerEmail ?? "—"}
                 {order.customerEmail && <CopyButton value={order.customerEmail} />}
               </p>
             </div>
             {order.shippingAddress && (
               <div>
-                <p className="text-[#999] text-xs tracking-wider">
-                  Shipping Address
+                <p className="flex items-center text-faded-foreground text-xs tracking-wider">
+                  Shipping address
                   <CopyButton
                     value={[
                       order.shippingName,
@@ -251,7 +276,7 @@ function OrderDetailPage() {
                       .join("\n")}
                   />
                 </p>
-                <address className="mt-1 text-[#333] not-italic leading-relaxed">
+                <address className="mt-1 text-foreground not-italic leading-relaxed">
                   {order.shippingName}
                   <br />
                   {order.shippingAddress.line1}
@@ -270,81 +295,81 @@ function OrderDetailPage() {
               </div>
             )}
           </div>
-        </section>
+        </InfoCard>
 
-        {/* Order dates */}
-        <section className="border border-[#e5e0d8] bg-white p-4">
-          <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">TIMELINE</h2>
+        {/* Timeline */}
+        <InfoCard title="Timeline">
           <div className="space-y-2 text-sm">
-            <TimelineRow p="Ordered" value={formatDate(order.createdAt)} />
+            <TimelineRow label="Ordered" value={formatDate(order.createdAt)} />
             <TimelineRow
-              p="Paid"
+              label="Paid"
               value={
                 order.status === "paid" || order.status === "fulfilled"
                   ? formatDate(order.updatedAt)
                   : "—"
               }
             />
-            <TimelineRow p="Fulfilled" value={formatDate(order.fulfilledAt)} />
-            <TimelineRow p="Shipped" value={formatDate(order.shippedAt)} />
+            <TimelineRow label="Fulfilled" value={formatDate(order.fulfilledAt)} />
+            <TimelineRow label="Shipped" value={formatDate(order.shippedAt)} />
             {order.trackingNumber && (
               <TimelineRow
-                p={`Tracking (${order.trackingCarrier ?? ""})`}
+                label={`Tracking (${order.trackingCarrier ?? ""})`}
                 value={order.trackingNumber}
               />
             )}
           </div>
-        </section>
+        </InfoCard>
       </div>
 
       {/* Line items */}
-      <section className="border border-[#e5e0d8] bg-white">
-        <div className="border-[#e5e0d8] border-b bg-[#f5f0eb] px-4 py-2">
-          <h2 className="font-heading text-[#333] text-sm tracking-wider">ITEMS</h2>
+      <section className="border border-border bg-background">
+        <div className="border-border border-b bg-muted px-4 py-2">
+          <h2 className="font-heading text-foreground text-sm tracking-wider">Items</h2>
         </div>
         <Table>
-          <TableHeader className="bg-[#f5f0eb]">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>Product</TableHead>
               <TableHead>Size</TableHead>
               <TableHead>Qty</TableHead>
-              <TableHead> Line Total</TableHead>
+              <TableHead>Line total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {order.items.map((item, i) => (
-              <TableRow key={item.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+              <TableRow key={item.id} className={i % 2 === 0 ? "bg-background" : "bg-muted/40"}>
                 <TableCell>{item.nameSnapshot}</TableCell>
                 <TableCell>{item.sizeSnapshot}</TableCell>
-                <TableCell>{item.quantity}</TableCell>
-                <TableCell>{formatCents(item.priceCentsSnapshot * item.quantity)}</TableCell>
+                <TableCell className="tabular-nums">{item.quantity}</TableCell>
+                <TableCell className="tabular-nums">
+                  {formatCents(item.priceCentsSnapshot * item.quantity)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <div className="border-[#e5e0d8] border-t px-4 py-3 text-sm">
-          <div className="flex justify-between text-[#555]">
+        <div className="border-border border-t px-4 py-3 text-sm">
+          <div className="flex justify-between text-secondary-foreground">
             <span>Subtotal</span>
-            <span>{formatCents(subtotal)}</span>
+            <span className="tabular-nums">{formatCents(subtotal)}</span>
           </div>
           {shipping !== null && shipping > 0 && (
-            <div className="flex justify-between text-[#555]">
+            <div className="flex justify-between text-secondary-foreground">
               <span>Shipping</span>
-              <span>{formatCents(shipping)}</span>
+              <span className="tabular-nums">{formatCents(shipping)}</span>
             </div>
           )}
           {order.amountTotalCents && (
-            <div className="mt-1 flex justify-between font-semibold text-[#111]">
+            <div className="mt-1 flex justify-between font-semibold text-foreground">
               <span>Total</span>
-              <span>{formatCents(order.amountTotalCents)}</span>
+              <span className="tabular-nums">{formatCents(order.amountTotalCents)}</span>
             </div>
           )}
         </div>
       </section>
 
       {/* Fulfillment actions */}
-      <section className="border border-[#e5e0d8] bg-white p-4">
-        <h2 className="mb-3 font-heading text-[#333] text-sm tracking-wider">FULFILLMENT</h2>
+      <InfoCard title="Fulfillment">
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -352,7 +377,7 @@ function OrderDetailPage() {
             disabled={saving || order.fulfillmentStatus === "fulfilled"}
             onClick={() => handleFulfillment("fulfilled")}
           >
-            {saving ? "Saving…" : "Mark Fulfilled"}
+            {saving ? "Saving…" : "Mark fulfilled"}
           </Button>
           <Button
             size="sm"
@@ -360,7 +385,7 @@ function OrderDetailPage() {
             onClick={() => setShowShipModal(true)}
             title={isRefunded ? "Order is refunded — do not ship" : undefined}
           >
-            Mark Shipped
+            Mark shipped
           </Button>
           <Button
             size="sm"
@@ -368,35 +393,38 @@ function OrderDetailPage() {
             disabled={saving || order.fulfillmentStatus === "unfulfilled"}
             onClick={() => setShowRevertConfirm(true)}
           >
-            Revert to Unfulfilled
+            Revert to unfulfilled
           </Button>
         </div>
-      </section>
+      </InfoCard>
 
       {/* Internal notes */}
-      <section className="border border-[#e5e0d8] bg-white p-4">
-        <h2 className="mb-2 font-heading text-[#333] text-sm tracking-wider">
-          INTERNAL NOTES
-          {notesSaving && <span className="ml-2 font-normal text-[#999] text-xs">Saving…</span>}
-        </h2>
+      <InfoCard
+        title="Internal notes"
+        trailing={
+          notesSaving && (
+            <span className="ml-2 font-normal text-faded-foreground text-xs">Saving…</span>
+          )
+        }
+      >
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={handleNotesSave}
           rows={4}
           placeholder="Private notes for the owner…"
-          className="w-full border border-[#e5e0d8] px-3 py-2 text-[#333] text-sm placeholder:text-[#bbb] focus:border-primary focus:outline-none"
+          className="w-full border border-border bg-background px-3 py-2 text-foreground text-sm placeholder:text-faded-foreground focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
         />
-      </section>
+      </InfoCard>
     </div>
   );
 }
 
-function TimelineRow({ p, value }: { p: string; value: string }) {
+function TimelineRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-[#999]">{p}</span>
-      <span className="text-[#333]">{value}</span>
+      <span className="text-faded-foreground">{label}</span>
+      <span className="text-foreground">{value}</span>
     </div>
   );
 }

@@ -36,6 +36,27 @@
       "when": 1778533424551,
       "tag": "0004_square_morbius",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778700030587,
+      "tag": "0005_sad_secret_warriors",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778700515261,
+      "tag": "0006_cultured_black_bird",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778703035495,
+      "tag": "0007_grey_the_renegades",
+      "breakpoints": true
     }
   ]
 }

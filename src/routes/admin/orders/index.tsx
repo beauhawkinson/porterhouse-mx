@@ -1,10 +1,11 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "@/components/ui/link";
 import {
   Select,
   SelectContent,
@@ -12,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FulfillmentBadge, PaymentBadge } from "@/components/ui/status-badges";
 import {
   Table,
   TableBody,
@@ -21,7 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listOrdersFn } from "@/lib/server/admin";
-import { FulfillmentBadge, PaymentBadge } from "@/routes/admin/index";
 
 const searchSchema = z.object({
   paymentStatus: z.enum(["all", "pending", "paid", "refunded"]).optional().default("all"),
@@ -66,6 +67,10 @@ function formatDate(date: string | Date | null) {
   });
 }
 
+// Shared className for Select trigger Buttons — keeps the dropdown text
+// in normal case rather than inheriting the Button base .
+const selectTriggerClass = "normal-case tracking-normal";
+
 function AdminOrdersPage() {
   const { orders, total, page, limit } = Route.useLoaderData();
   const search = Route.useSearch();
@@ -88,7 +93,7 @@ function AdminOrdersPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs tracking-wider">Payment</p>
+          <p className="text-faded-foreground text-xs tracking-wider">Payment</p>
           <Select
             value={search.paymentStatus ?? "all"}
             onValueChange={(value) =>
@@ -98,7 +103,7 @@ function AdminOrdersPage() {
             }
           >
             <SelectTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" size="sm" className={selectTriggerClass}>
                 <SelectValue />
                 <ChevronDown className="size-4" />
               </Button>
@@ -113,7 +118,7 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs tracking-wider">Fulfillment</p>
+          <p className="text-faded-foreground text-xs tracking-wider">Fulfillment</p>
           <Select
             value={search.fulfillmentStatus ?? "all"}
             onValueChange={(value) =>
@@ -123,7 +128,7 @@ function AdminOrdersPage() {
             }
           >
             <SelectTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" size="sm" className={selectTriggerClass}>
                 <SelectValue />
                 <ChevronDown className="size-4" />
               </Button>
@@ -138,13 +143,13 @@ function AdminOrdersPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs tracking-wider">Sort</p>
+          <p className="text-faded-foreground text-xs tracking-wider">Sort</p>
           <Select
             value={search.sort ?? "desc"}
             onValueChange={(value) => updateFilter({ sort: value as "asc" | "desc" })}
           >
             <SelectTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" size="sm" className={selectTriggerClass}>
                 <SelectValue />
                 <ChevronDown className="size-4" />
               </Button>
@@ -157,7 +162,7 @@ function AdminOrdersPage() {
         </div>
 
         <form onSubmit={handleEmailSearch} className="flex flex-col gap-1">
-          <p className="text-[#999] text-xs tracking-wider">Email search</p>
+          <p className="text-faded-foreground text-xs tracking-wider">Email search</p>
           <div className="flex gap-1">
             <Input
               type="text"
@@ -165,42 +170,40 @@ function AdminOrdersPage() {
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="rider@gmail.com"
             />
-            <button
-              type="submit"
-              className="border border-[#e5e0d8] bg-white px-3 py-1.5 text-[#333] text-sm hover:bg-[#f5f0eb]"
-            >
+            <Button type="submit" variant="outline" size="sm" className={selectTriggerClass}>
               Search
-            </button>
+            </Button>
             {search.searchEmail && (
-              <button
-                type="button"
+              <Button
+                variant="muted"
+                size="none"
                 onClick={() => {
                   setEmailInput("");
                   updateFilter({ searchEmail: undefined });
                 }}
-                className="px-3 py-1.5 text-[#999] text-sm hover:text-[#333]"
+                className="px-3"
               >
                 Clear
-              </button>
+              </Button>
             )}
           </div>
         </form>
       </div>
 
-      <p className="text-[#999] text-sm">
+      <p className="text-faded-foreground text-sm">
         {total} order{total !== 1 ? "s" : ""}
         {search.searchEmail ? ` matching "${search.searchEmail}"` : ""}
       </p>
 
       {/* Table */}
       {orders.length === 0 ? (
-        <div className="py-16 text-center text-[#999]">
-          <p className="font-heading text-xl">NO ORDERS FOUND</p>
+        <div className="py-16 text-center text-faded-foreground">
+          <p className="font-heading text-xl tracking-wider">No orders found</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-lg border border-border">
           <Table>
-            <TableHeader className="bg-[#f5f0eb]">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
@@ -213,11 +216,20 @@ function AdminOrdersPage() {
             </TableHeader>
             <TableBody>
               {orders.map((o, i) => (
-                <TableRow key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                <TableRow key={o.id} className={i % 2 === 0 ? "bg-background" : "bg-muted/40"}>
                   <TableCell>{formatDate(o.createdAt)}</TableCell>
-                  <TableCell>{o.customerEmail ?? "—"}</TableCell>
+                  <TableCell>
+                    <Link
+                      to="/admin/orders/$orderId"
+                      params={{ orderId: o.id }}
+                      variant="data"
+                      size="none"
+                    >
+                      {o.customerEmail ?? "—"}
+                    </Link>
+                  </TableCell>
                   <TableCell>{o.items.length}</TableCell>
-                  <TableCell>{formatCents(o.amountTotalCents)}</TableCell>
+                  <TableCell className="tabular-nums">{formatCents(o.amountTotalCents)}</TableCell>
                   <TableCell>
                     <PaymentBadge status={o.status} />
                   </TableCell>
@@ -228,7 +240,8 @@ function AdminOrdersPage() {
                     <Link
                       to="/admin/orders/$orderId"
                       params={{ orderId: o.id }}
-                      className="font-heading text-[#6B4423] text-xs tracking-wider underline hover:text-[#3E2A1E]"
+                      variant="action"
+                      size="none"
                     >
                       View
                     </Link>
@@ -243,26 +256,28 @@ function AdminOrdersPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-[#999]">
+          <span className="text-faded-foreground">
             Page {page} of {totalPages}
           </span>
           <div className="flex gap-2">
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
               disabled={page <= 1}
               onClick={() => navigate({ search: (prev) => ({ ...prev, page: page - 1 }) })}
-              className="border border-[#e5e0d8] px-3 py-1 text-[#333] hover:bg-[#f5f0eb] disabled:opacity-40"
+              className={selectTriggerClass}
             >
               Prev
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               disabled={page >= totalPages}
               onClick={() => navigate({ search: (prev) => ({ ...prev, page: page + 1 }) })}
-              className="border border-[#e5e0d8] px-3 py-1 text-[#333] hover:bg-[#f5f0eb] disabled:opacity-40"
+              className={selectTriggerClass}
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}

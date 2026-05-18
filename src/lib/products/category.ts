@@ -2,7 +2,7 @@ import type { Category } from "@/lib/db/schema";
 
 /**
  * Display labels for product categories (singular form).
- * Use Tailwind's `uppercase` class when you want all-caps presentation —
+ * Use Tailwind's `` class when you want all-caps presentation —
  * keeps the underlying text accessible while letting CSS handle styling.
  *
  * The `Record<Category, string>` annotation enforces exhaustiveness: add a

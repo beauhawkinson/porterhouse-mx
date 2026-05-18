@@ -1,5 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
+import Link from "@/components/ui/link";
 import { signIn } from "@/lib/auth-client";
 import { app } from "@/lib/config/app.config";
 
@@ -19,37 +20,34 @@ function SignInPage() {
     <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4">
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-10 text-center">
-          <Link
-            to="/"
-            className="font-moto_is_life text-[#111] text-xl tracking-widest transition-colors hover:text-[#6B4423]"
-          >
+          <Link to="/" variant="logo" size="none">
             {app.brand.name}
           </Link>
-          <h1 className="mt-6 mb-2 font-heading text-3xl text-[#111]">SIGN IN</h1>
-          <p className="text-[#666] text-sm">
+          <h1 className="mt-6 mb-2 font-heading text-3xl text-foreground">Sign in</h1>
+          <p className="text-muted-foreground text-sm">
             Sign in to track your orders. Guest checkout is always available.
           </p>
         </div>
 
-        <div className="border border-[#e5e0d8] bg-white p-8">
+        <div className="border border-border bg-background p-8">
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="flex w-full cursor-pointer items-center justify-center gap-3 border border-[#ddd] px-4 py-3 font-medium text-[#333] text-sm transition-all hover:border-primary hover:text-[#6B4423]"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 border border-border px-4 py-3 font-medium text-foreground text-sm hover:border-primary hover:text-primary"
           >
             <GoogleIcon />
             Continue with Google
           </button>
 
-          <p className="mt-6 text-center text-[#999] text-xs">
+          <p className="mt-6 text-center text-faded-foreground text-xs">
             By signing in, you agree to our{" "}
-            <span className="cursor-pointer underline">terms of service</span>.
+            <span className="cursor-pointer underline underline-offset-4">terms of service</span>.
           </p>
         </div>
 
-        <p className="mt-6 text-center text-[#666] text-sm">
+        <p className="mt-6 text-center text-muted-foreground text-sm">
           Just browsing?{" "}
-          <Link to="/shop" className="underline transition-colors hover:text-[#6B4423]">
+          <Link to="/shop" variant="inline" size="none">
             Continue to shop
           </Link>
         </p>

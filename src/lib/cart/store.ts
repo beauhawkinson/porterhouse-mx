@@ -4,22 +4,17 @@ import { persist } from "zustand/middleware";
 import { app } from "../config/app.config";
 
 export type CartItem = {
-  // Null for variant-less products (e.g. stickers).
   variantId: string | null;
   productId: string;
   slug: string;
   name: string;
-  // Null for variant-less products.
   size: string | null;
   priceCents: number;
   imageUrl: string;
   quantity: number;
+  stock: number;
 };
 
-/**
- * Identity key for a cart line item. Falls back to productId when there's no
- * variant (stickers). Use everywhere we need to dedupe / look up a line item.
- */
 export const cartKey = (item: Pick<CartItem, "variantId" | "productId">): string =>
   item.variantId ?? item.productId;
 
@@ -43,13 +38,20 @@ export const useCartStore = create<CartStore>()(
         set((state) => {
           const existing = state.items.find((i) => cartKey(i) === key);
           if (existing) {
+            // Cap at the freshest stock value (could have changed since last
+            // addItem) and refresh the stored stock so future increments use
+            // the latest known limit.
+            const nextQty = Math.min(existing.quantity + 1, item.stock);
             return {
               items: state.items.map((i) =>
-                cartKey(i) === key ? { ...i, quantity: i.quantity + 1 } : i,
+                cartKey(i) === key ? { ...i, quantity: nextQty, stock: item.stock } : i,
               ),
             };
           }
-          return { items: [...state.items, { ...item, quantity: 1 }] };
+          // New line: clamp the initial quantity to stock just in case.
+          const initial = item.stock > 0 ? 1 : 0;
+          if (initial === 0) return state; // don't add a 0-qty line
+          return { items: [...state.items, { ...item, quantity: initial }] };
         });
       },
 
@@ -65,7 +67,11 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         set((state) => ({
-          items: state.items.map((i) => (cartKey(i) === key ? { ...i, quantity } : i)),
+          items: state.items.map((i) =>
+            cartKey(i) === key
+              ? { ...i, quantity: Math.min(quantity, i.stock) } // cap to stored stock
+              : i,
+          ),
         }));
       },
 

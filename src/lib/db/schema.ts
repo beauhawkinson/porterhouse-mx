@@ -66,12 +66,31 @@ export const verification = pgTable("verification", {
 // ─── Store enums ─────────────────────────────────────────────────────────────
 
 export const categoryEnum = pgEnum("category", ["tshirt", "sweatshirt", "sticker"]);
+
 export const sizeEnum = pgEnum("size", ["S", "M", "L", "XL", "XXL"]);
+
 export const orderStatusEnum = pgEnum("order_status", ["pending", "paid", "fulfilled", "refunded"]);
 
-export type Category = (typeof categoryEnum.enumValues)[number];
-export type Size = (typeof sizeEnum.enumValues)[number];
-export type OrderStatus = (typeof orderStatusEnum.enumValues)[number];
+export const productStatusEnum = pgEnum("product_status", ["draft", "active", "archived"]);
+
+export const fulfillmentStatusEnum = pgEnum("fulfillment_status", [
+  "unfulfilled",
+  "fulfilled",
+  "shipped",
+]);
+
+export const CATEGORY_VALUES = categoryEnum.enumValues;
+export const SIZE_VALUES = sizeEnum.enumValues;
+export const ORDER_STATUS_VALUES = orderStatusEnum.enumValues;
+export const PRODUCT_STATUS_VALUES = productStatusEnum.enumValues;
+export const FULFILLMENT_STATUS_VALUES = fulfillmentStatusEnum.enumValues;
+
+export type Category = (typeof CATEGORY_VALUES)[number];
+export type Size = (typeof SIZE_VALUES)[number];
+export type OrderStatus = (typeof ORDER_STATUS_VALUES)[number];
+export type ProductStatus = (typeof PRODUCT_STATUS_VALUES)[number];
+export type FulfillmentStatus = (typeof FULFILLMENT_STATUS_VALUES)[number];
+
 // ─── Products ────────────────────────────────────────────────────────────────
 
 export const product = pgTable("product", {
@@ -79,13 +98,15 @@ export const product = pgTable("product", {
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   description: text("description").notNull(),
+  details: text("details"),
   priceCents: integer("price_cents").notNull(),
   imageUrl: text("image_url").notNull(),
   category: categoryEnum("category").notNull(),
+  status: productStatusEnum("status").notNull().default("draft"),
   stripeProductId: text("stripe_product_id"),
+  // ONLY used for variant-less products like stickers
   stripePriceId: text("stripe_price_id"),
-  // Used for variant-less products (e.g. stickers). For products with variants,
-  // stock is tracked per-variant on product_variant.stock and this stays at 0.
+  // ONLY used for variant-less products
   stock: integer("stock").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -101,6 +122,7 @@ export const productVariant = pgTable(
     size: sizeEnum("size").notNull(),
     stock: integer("stock").notNull().default(0),
     stripePriceId: text("stripe_price_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [unique().on(t.productId, t.size)],
 );
@@ -142,11 +164,7 @@ export const order = pgTable("order", {
   customerEmail: text("customer_email"),
   shippingName: text("shipping_name"),
   shippingAddress: jsonb("shipping_address").$type<ShippingAddress>(),
-  fulfillmentStatus: text("fulfillment_status", {
-    enum: ["unfulfilled", "fulfilled", "shipped"],
-  })
-    .notNull()
-    .default("unfulfilled"),
+  fulfillmentStatus: fulfillmentStatusEnum("fulfillment_status").notNull().default("unfulfilled"),
   trackingNumber: text("tracking_number"),
   trackingCarrier: text("tracking_carrier"),
   fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),

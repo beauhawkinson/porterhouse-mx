@@ -6,38 +6,63 @@ import type * as React from "react";
 
 const buttonVariants = cva(
   [
-    "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-heading tracking-wider",
-    "[&_svg]:pointer-events-none [&_svg]:shrink-0 shrink-0",
+    "inline-flex items-center justify-center gap-2",
+    "outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
-    "select-none outline-none transition-all duration-150",
-    "active:scale-[0.97] rounded-lg",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   ],
   {
     variants: {
       variant: {
-        unstyled: "",
         primary:
-          "bg-foreground text-background border-0 shadow-sm hover:bg-mud-darkest focus-visible:ring focus-visible:ring-mud focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "rounded-lg font-heading whitespace-nowrap select-none active:scale-[0.97] bg-foreground text-background shadow-sm hover:bg-foreground/80",
         outline:
-          "focus-visible:border-primary border-border border bg-transparent text-secondary-foreground hover:bg-muted hover:text-foreground",
+          "rounded-lg font-heading whitespace-nowrap select-none active:scale-[0.97] border border-border bg-transparent text-secondary-foreground hover:bg-muted hover:text-foreground",
         secondary:
-          "bg-muted text-foreground border border-border hover:border-mud hover:text-mud-dark focus-visible:border-mud",
+          "rounded-lg font-heading whitespace-nowrap select-none active:scale-[0.97] bg-muted text-foreground border border-border hover:border-foreground",
         ghost:
-          "bg-transparent text-foreground border-transparent hover:text-mud-dark hover:bg-muted",
+          "rounded-lg font-heading whitespace-nowrap select-none active:scale-[0.97] bg-transparent text-foreground hover:bg-muted hover:text-primary",
+        // Inline within prose: "Sign in", "Continue shopping"
+        inline: "rounded-sm text-primary underline underline-offset-4 hover:text-primary/80",
+        // Small utility actions in tables/lists: "Edit", "View"
+        action:
+          "rounded-sm font-heading text-primary text-xs underline underline-offset-4 hover:text-primary/80",
+        // Section links from headers: "Shop all →", "View all"
+        section:
+          "rounded-sm font-heading text-foreground text-sm underline-offset-4 hover:underline hover:text-primary",
+        // Subtle muted toggles: "Show sizes" / "Hide sizes"
+        muted:
+          "rounded-sm text-faded-foreground text-xs underline underline-offset-4 hover:text-foreground",
+        // Nav (header + admin sub-nav)
+        nav: "rounded-sm font-heading text-secondary-foreground text-sm hover:text-primary [&.active]:text-foreground [&.active]:underline [&.active]:underline-offset-4",
+        // Mobile menu rows — full-width, bigger touch target
+        "nav-mobile":
+          "rounded-sm block w-full py-3 font-heading text-foreground text-base hover:text-primary [&.active]:text-primary",
+        // Tabular data cells
+        data: "rounded-sm text-foreground underline underline-offset-4 decoration-border hover:text-primary hover:decoration-primary",
+        // Logo / brand wordmark
+        logo: "rounded-sm font-moto_is_life text-foreground text-xl tracking-widest hover:text-primary",
+        // Escape hatch
+        breadcrumb: "rounded-sm hover:text-primary",
+        destructive:
+          "border-0 bg-red-500 rounded-lg  text-white hover:bg-red-500/80 focus-visible:ring focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        unstyled: "",
       },
       size: {
         sm: "px-3 py-1.5 text-sm",
-        md: "px-6 py-3 text-base",
-        lg: "px-8 py-4 text-lg",
+        md: "px-6 py-3 text-sm",
+        lg: "px-8 py-4 text-sm",
         "icon-sm": "size-8",
         "icon-md": "size-10",
         "icon-lg": "size-12",
+        // For text-shaped variants — they bring their own typography
+        none: "",
       },
     },
     defaultVariants: {
       variant: "primary",
-      size: "sm",
+      size: "md",
     },
   },
 );
@@ -48,7 +73,13 @@ function Button({
   size,
   ...props
 }: React.ComponentProps<"button"> & VariantProps<typeof buttonVariants>) {
-  return <button className={clsx(buttonVariants({ variant, size }), className)} {...props} />;
+  return (
+    <button
+      type="button"
+      className={clsx(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
 }
 
 export { Button, buttonVariants };

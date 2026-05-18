@@ -1,8 +1,8 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import Link from "@/components/ui/link";
 import { useCartStore } from "@/lib/cart/store";
 import { app } from "@/lib/config/app.config";
 import { getOrderBySessionId } from "@/lib/server/checkout";
@@ -30,7 +30,7 @@ function SuccessPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="font-heading text-3xl text-[#333]">ORDER NOT FOUND</h1>
-        <Link to="/shop" className="mt-6 inline-block text-[#6B4423] underline">
+        <Link to="/shop" variant="inline" size="none" className="mt-6 inline-block">
           Continue shopping
         </Link>
       </div>
@@ -146,8 +146,8 @@ function SuccessPage() {
       </p>
 
       <div className="text-center">
-        <Link to="/shop">
-          <Button size="lg">KEEP SHOPPING</Button>
+        <Link to="/shop" size="lg">
+          Keep shopping
         </Link>
       </div>
     </div>

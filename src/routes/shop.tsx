@@ -1,13 +1,12 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { ProductCard } from "@/components/products/ProductCard";
+import { FilterPill } from "@/components/ui/filter-pill";
 import { categoryEnum } from "@/lib/db/schema";
 import { CATEGORY_LABELS_PLURAL } from "@/lib/products/category";
 import { hasStock } from "@/lib/products/stock";
 import { getProducts } from "@/lib/server/products";
-
-import type { Category } from "@/lib/db/schema";
 
 const searchSchema = z.object({
   category: z.enum(categoryEnum.enumValues).optional(),
@@ -26,7 +25,7 @@ function ShopPage() {
   const filtered = category ? products.filter((p) => p.category === category) : products;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       {/* Header */}
       <div className="relative mb-8">
         <h1 className="mb-2 font-heading text-3xl text-[#111] sm:text-5xl">The Shop</h1>
@@ -56,7 +55,7 @@ function ShopPage() {
           <p className="font-heading text-2xl">No Products Found</p>
         </div>
       ) : (
-        <div className="grid max-w-3xl grid-cols-1 gap-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {filtered.map((p) => (
             <ProductCard
               key={p.id}
@@ -72,31 +71,5 @@ function ShopPage() {
         </div>
       )}
     </div>
-  );
-}
-
-function FilterPill({
-  to,
-  search,
-  active,
-  label,
-}: {
-  to: string;
-  search: { category?: Category };
-  active: boolean;
-  label: string;
-}) {
-  return (
-    <Link
-      to={to}
-      search={search}
-      className={`border px-4 py-2 font-medium text-sm uppercase tracking-wider transition-colors ${
-        active
-          ? "border-[#111] bg-[#111] text-white"
-          : "border-[#ddd] text-[#555] hover:border-[#111] hover:text-[#111]"
-      }`}
-    >
-      {label}
-    </Link>
   );
 }

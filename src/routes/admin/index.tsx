@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { FulfillmentBadge, PaymentBadge } from "@/components/ui/status-badges";
 import {
   Table,
   TableBody,
@@ -109,35 +110,5 @@ function AdminDashboard() {
         )}
       </section>
     </div>
-  );
-}
-
-export function PaymentBadge({ status }: { status: string }) {
-  const cls =
-    status === "paid"
-      ? "bg-green-100 text-green-800"
-      : status === "refunded"
-        ? "bg-red-100 text-red-800"
-        : "bg-[#f5f0eb] text-[#666]";
-
-  return (
-    <span className={`inline-block rounded px-2 py-0.5 font-medium text-xs tracking-wider ${cls}`}>
-      {status}
-    </span>
-  );
-}
-
-export function FulfillmentBadge({ status }: { status: string }) {
-  const cls =
-    status === "shipped"
-      ? "bg-green-100 text-green-800"
-      : status === "fulfilled"
-        ? "bg-blue-100 text-blue-800"
-        : "bg-amber-100 text-amber-800";
-
-  return (
-    <span className={`inline-block rounded px-2 py-0.5 font-medium text-xs tracking-wider ${cls}`}>
-      {status}
-    </span>
   );
 }

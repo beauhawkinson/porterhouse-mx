@@ -70,7 +70,7 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
-      className="relative flex h-7 w-full select-none items-center gap-1.5 rounded-lg px-2 outline-hidden hover:bg-muted focus:bg-muted focus:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none"
+      className="relative flex h-7 w-full select-none items-center gap-1.5 rounded-lg px-2 text-sm outline-hidden hover:bg-muted focus:bg-muted focus:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none"
       {...props}
     >
       {icon && <span className="flex items-center">{icon}</span>}

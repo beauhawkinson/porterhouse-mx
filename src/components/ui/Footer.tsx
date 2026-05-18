@@ -1,6 +1,6 @@
 import { app } from "@/lib/config/app.config";
 
-export function Footer() {
+const Footer = () => {
   return (
     <footer className="relative overflow-hidden">
       <div className="relative z-10 mx-auto max-w-7xl p-4">
@@ -10,4 +10,6 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+};
+
+export { Footer };

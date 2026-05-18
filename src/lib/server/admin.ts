@@ -1,11 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { and, asc, count, desc, eq, ilike, sum } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, like, sum } from "drizzle-orm";
 import { z } from "zod";
 
+import { productFormSchema } from "@/components/products/ProductForm";
 import { stripeClient } from "@/lib/config/stripe.config";
 import { db } from "@/lib/db/db";
-import { categoryEnum, order, product, productVariant } from "@/lib/db/schema";
+import {
+  SIZE_VALUES,
+  categoryEnum,
+  order,
+  product,
+  productImage,
+  productVariant,
+} from "@/lib/db/schema";
 import { totalStock } from "@/lib/products/stock";
 import { checkIsAdmin, requireAdmin } from "@/lib/server/admin-guard";
 
@@ -218,13 +226,20 @@ export const getAdminProductFn = createServerFn({ method: "GET" })
     return p ?? null;
   });
 
+// Replace your existing updateProductSchema and updateProductFn with this.
+
 const updateProductSchema = z.object({
   productId: z.uuid(),
-  name: z.string().min(1),
-  description: z.string().min(1),
-  priceCents: z.number().int().min(1),
-  imageUrl: z.string().min(1),
-  category: z.enum(categoryEnum.enumValues),
+  // Every field other than productId is optional. The form sends them all in
+  // edit mode, but other callers (like the archive button) only send status.
+  name: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
+  details: z.string().optional().nullable(),
+  priceCents: z.number().int().min(1).optional(),
+  imageUrl: z.string().min(1).optional(),
+  category: z.enum(categoryEnum.enumValues).optional(),
+  status: z.enum(["draft", "active", "archived"]).optional(),
+  stock: z.number().int().min(0).optional(),
 });
 
 export const updateProductFn = createServerFn({ method: "POST" })
@@ -238,39 +253,85 @@ export const updateProductFn = createServerFn({ method: "POST" })
 
     if (!existing) throw new Error("Product not found");
 
-    const updates: Partial<typeof existing> = {
-      name: data.name,
-      description: data.description,
-      priceCents: data.priceCents,
-      imageUrl: data.imageUrl,
-      category: data.category,
-      updatedAt: new Date(),
-    };
+    // Build the update object from only the fields that were actually sent.
+    type ProductUpdate = Partial<typeof product.$inferInsert>;
+    const updates: ProductUpdate = { updatedAt: new Date() };
 
-    // Sync name/description with Stripe Product
-    if (
-      existing.stripeProductId &&
-      (data.name !== existing.name || data.description !== existing.description)
-    ) {
+    if (data.name !== undefined) updates.name = data.name;
+    if (data.description !== undefined) updates.description = data.description;
+    if (data.details !== undefined) updates.details = data.details;
+    if (data.imageUrl !== undefined) updates.imageUrl = data.imageUrl;
+    if (data.category !== undefined) updates.category = data.category;
+    if (data.status !== undefined) updates.status = data.status;
+    if (data.priceCents !== undefined) updates.priceCents = data.priceCents;
+
+    // Stock only applies to stickers (variant-less products). For apparel,
+    // stock lives on variants and is updated via updateVariantStockFn.
+    if (data.stock !== undefined && existing.category === "sticker") {
+      updates.stock = data.stock;
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Stripe sync — only when relevant fields actually changed
+    // ──────────────────────────────────────────────────────────────
+
+    // Name / description sync to Stripe Product
+    const nameChanged = data.name !== undefined && data.name !== existing.name;
+    const descriptionChanged =
+      data.description !== undefined && data.description !== existing.description;
+
+    if (existing.stripeProductId && (nameChanged || descriptionChanged)) {
       await stripeClient.products.update(existing.stripeProductId, {
-        name: data.name,
-        description: data.description,
+        name: data.name ?? existing.name,
+        description: data.description ?? existing.description,
       });
     }
 
-    // If price changed: create new Stripe Price, archive old, update DB
-    if (data.priceCents !== existing.priceCents && existing.stripeProductId) {
-      const newPrice = await stripeClient.prices.create({
-        product: existing.stripeProductId,
-        unit_amount: data.priceCents,
-        currency: "usd",
-      });
+    // Price change → create new Stripe Price, archive old, update DB
+    if (
+      data.priceCents !== undefined &&
+      data.priceCents !== existing.priceCents &&
+      existing.stripeProductId
+    ) {
+      if (existing.category === "sticker") {
+        // Stickers: single price on the product row.
+        const newPrice = await stripeClient.prices.create({
+          product: existing.stripeProductId,
+          unit_amount: data.priceCents,
+          currency: "usd",
+          metadata: { slug: existing.slug },
+        });
 
-      if (existing.stripePriceId) {
-        await stripeClient.prices.update(existing.stripePriceId, { active: false });
+        if (existing.stripePriceId) {
+          await stripeClient.prices.update(existing.stripePriceId, { active: false });
+        }
+
+        updates.stripePriceId = newPrice.id;
+      } else {
+        // Apparel: one price per variant. Create new prices, archive old ones,
+        // update each variant row with its new stripePriceId.
+        const variants = await db.query.productVariant.findMany({
+          where: eq(productVariant.productId, existing.id),
+        });
+
+        for (const v of variants) {
+          const newPrice = await stripeClient.prices.create({
+            product: existing.stripeProductId,
+            unit_amount: data.priceCents,
+            currency: "usd",
+            metadata: { slug: existing.slug, size: v.size },
+          });
+
+          if (v.stripePriceId) {
+            await stripeClient.prices.update(v.stripePriceId, { active: false });
+          }
+
+          await db
+            .update(productVariant)
+            .set({ stripePriceId: newPrice.id })
+            .where(eq(productVariant.id, v.id));
+        }
       }
-
-      updates.stripePriceId = newPrice.id;
     }
 
     const [updated] = await db
@@ -302,23 +363,194 @@ export const updateVariantStockFn = createServerFn({ method: "POST" })
     return updated ?? null;
   });
 
-// Restock a variant-less product (stickers). Parallel to updateVariantStockFn
-// but writes to product.stock instead of productVariant.stock.
-// const updateProductStockSchema = z.object({
-//   productId: z.uuid(),
-//   stock: z.number().int().min(0),
-// });
+/**
+ * Convert an arbitrary string into a URL-safe slug.
+ *   "Mud Demon Sticker!" → "mud-demon-sticker"
+ */
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // strip non-alphanumeric (keeps spaces/hyphens)
+    .replace(/\s+/g, "-") // spaces → hyphens
+    .replace(/-+/g, "-") // collapse multiple hyphens
+    .replace(/^-|-$/g, ""); // trim leading/trailing hyphens
+}
 
-// const updateProductStockFn = createServerFn({ method: "POST" })
-//   .inputValidator((data: unknown) => updateProductStockSchema.parse(data))
-//   .handler(async ({ data }) => {
-//     await requireAdmin(getRequest());
+/**
+ * Generate a slug that doesn't collide with any existing product.slug.
+ * Falls back to "name-2", "name-3", etc.
+ */
+async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name);
+  if (!base) throw new Error("Cannot generate a slug from this name");
 
-//     const [updated] = await db
-//       .update(product)
-//       .set({ stock: data.stock, updatedAt: new Date() })
-//       .where(eq(product.id, data.productId))
-//       .returning();
+  // Pull all slugs that start with the base — we'll filter in-memory rather
+  // than hammer the DB in a loop.
+  const existing = await db
+    .select({ slug: product.slug })
+    .from(product)
+    .where(like(product.slug, `${base}%`));
 
-//     return updated ?? null;
-//   });
+  const taken = new Set(existing.map((r) => r.slug));
+
+  if (!taken.has(base)) return base;
+
+  for (let n = 2; n < 1000; n++) {
+    const candidate = `${base}-${n}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+
+  // Pathological case — shouldn't happen
+  throw new Error(`Could not generate unique slug for "${name}"`);
+}
+
+/**
+ * Archive every Stripe object that was created during a failed createProductFn
+ * run. Best-effort — logs failures but never throws (we're already in an error
+ * path; throwing here just hides the original error).
+ */
+async function rollbackStripe(opts: { productId: string | null; priceIds: string[] }) {
+  // Archive prices first (a product can't be archived while prices reference it,
+  // but archiving is allowed in any order — we archive prices defensively).
+  for (const priceId of opts.priceIds) {
+    try {
+      await stripeClient.prices.update(priceId, { active: false });
+    } catch (err) {
+      console.error(`[createProductFn rollback] failed to archive price ${priceId}`, err);
+    }
+  }
+
+  if (opts.productId) {
+    try {
+      await stripeClient.products.update(opts.productId, { active: false });
+    } catch (err) {
+      console.error(`[createProductFn rollback] failed to archive product ${opts.productId}`, err);
+    }
+  }
+}
+
+// ─── createProductFn ─────────────────────────────────────────────────────
+
+export const createProductFn = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => productFormSchema.parse(data))
+  .handler(async ({ data }) => {
+    await requireAdmin(getRequest());
+
+    const isSticker = data.category === "sticker";
+
+    // Track what we've created so we can roll back on failure.
+    let stripeProductId: string | null = null;
+    const stripePriceIds: string[] = [];
+
+    try {
+      // ────────────────────────────────────────────────────────────────
+      // 1. Generate unique slug
+      // ────────────────────────────────────────────────────────────────
+      const slug = await generateUniqueSlug(data.name);
+
+      // ────────────────────────────────────────────────────────────────
+      // 2. Create Stripe product
+      // ────────────────────────────────────────────────────────────────
+      const stripeProduct = await stripeClient.products.create({
+        name: data.name,
+        description: data.description,
+        metadata: {
+          slug,
+          category: data.category,
+        },
+      });
+      stripeProductId = stripeProduct.id;
+
+      // ────────────────────────────────────────────────────────────────
+      // 3. Create Stripe price(s)
+      //    - Sticker: one price on the product
+      //    - Apparel: one price per size (S/M/L/XL/XXL)
+      // ────────────────────────────────────────────────────────────────
+      let stickerStripePriceId: string | null = null;
+      const variantPriceIds: Record<string, string> = {};
+
+      if (isSticker) {
+        const price = await stripeClient.prices.create({
+          product: stripeProductId,
+          unit_amount: data.priceCents,
+          currency: "usd",
+          metadata: { slug },
+        });
+        stickerStripePriceId = price.id;
+        stripePriceIds.push(price.id);
+      } else {
+        for (const size of SIZE_VALUES) {
+          const price = await stripeClient.prices.create({
+            product: stripeProductId,
+            unit_amount: data.priceCents,
+            currency: "usd",
+            metadata: { slug, size },
+          });
+          variantPriceIds[size] = price.id;
+          stripePriceIds.push(price.id);
+        }
+      }
+
+      // ────────────────────────────────────────────────────────────────
+      // 4. Insert DB product
+      // ────────────────────────────────────────────────────────────────
+      const [row] = await db
+        .insert(product)
+        .values({
+          slug,
+          name: data.name,
+          description: data.description,
+          details: data.details ?? null,
+          priceCents: data.priceCents,
+          imageUrl: data.imageUrl,
+          category: data.category,
+          status: data.status,
+          stripeProductId,
+          stripePriceId: isSticker ? stickerStripePriceId : null,
+          stock: isSticker ? (data.stock ?? 0) : 0,
+        })
+        .returning();
+
+      if (!row) {
+        throw new Error("Failed to insert product row");
+      }
+
+      // ────────────────────────────────────────────────────────────────
+      // 5. Insert apparel variants (S/M/L/XL/XXL with stock 0)
+      // ────────────────────────────────────────────────────────────────
+      if (!isSticker) {
+        await db.insert(productVariant).values(
+          SIZE_VALUES.map((size) => ({
+            productId: row.id,
+            size,
+            stock: 0,
+            stripePriceId: variantPriceIds[size] ?? null,
+          })),
+        );
+      }
+
+      // ────────────────────────────────────────────────────────────────
+      // 6. Insert primary product image
+      // ────────────────────────────────────────────────────────────────
+      await db.insert(productImage).values({
+        productId: row.id,
+        url: data.imageUrl,
+        alt: data.name,
+        sortOrder: 0,
+      });
+
+      return { id: row.id, slug: row.slug };
+    } catch (err) {
+      // Roll back Stripe side. DB inserts are inside the same try block; if any
+      // failed, partial rows may remain — log so the admin can investigate.
+      console.error("[createProductFn] failed — rolling back Stripe", err);
+
+      await rollbackStripe({
+        productId: stripeProductId,
+        priceIds: stripePriceIds,
+      });
+
+      throw err;
+    }
+  });

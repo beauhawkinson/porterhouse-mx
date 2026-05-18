@@ -1,9 +1,9 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { CartItemRow } from "@/components/cart/CartItem";
-import { Splatter } from "@/components/splatter";
 import { Button } from "@/components/ui/button";
+import Link from "@/components/ui/link";
 import { useSession } from "@/lib/auth-client";
 import { cartKey, useCartStore } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/server/checkout";
@@ -52,18 +52,15 @@ function CartPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 py-32 text-center">
-        <Splatter className="mx-auto mb-6 w-24 opacity-20" color="#6B4423" />
         <h1 className="mb-4 font-heading text-4xl text-[#111]">YOUR CART IS EMPTY</h1>
         <p className="mb-8 text-[#666]">Looks like you haven't added anything yet.</p>
-        <Link to="/shop">
-          <Button size="lg">Shop Now</Button>
-        </Link>
+        <Link to="/shop">Shop now</Link>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <h1 className="mb-10 font-heading text-4xl text-[#111]">Your Cart</h1>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
@@ -108,12 +105,12 @@ function CartPage() {
             )}
 
             <Button size="lg" className="w-full" onClick={handleCheckout} disabled={isLoading}>
-              {isLoading ? "REDIRECTING..." : "CHECKOUT →"}
+              CHECKOUT
             </Button>
 
             {!session && (
               <p className="mt-3 text-center text-[#999] text-xs">
-                <Link to="/sign-in" className="underline hover:text-[#6B4423]">
+                <Link to="/sign-in" variant="inline" size="none">
                   Sign in
                 </Link>{" "}
                 to save your order history (optional).

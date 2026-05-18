@@ -1,6 +1,7 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import Link from "@/components/ui/link";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { listAdminProductsFn } from "@/lib/server/admin";
 
@@ -26,7 +27,12 @@ function AdminProductsPage() {
 
   return (
     <div className="space-y-4">
-      <p className="text-[#999] text-sm">{products.length} products</p>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-heading text-foreground text-xl tracking-wider">Products</h2>
+        <Link to="/admin/products/new" size="sm">
+          New product
+        </Link>
+      </div>
 
       {products.length === 0 ? (
         <div className="py-16 text-center text-[#999]">
@@ -37,7 +43,7 @@ function AdminProductsPage() {
           <Table>
             <TableHeader className="bg-[#f5f0eb]">
               <TableRow>
-                <TableHead className="w-16 px-4 py-2" />
+                <TableHead className="w-auto px-4 py-2" />
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
@@ -57,7 +63,11 @@ function AdminProductsPage() {
                     <TableRow key={p.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
                       <TableHead>
                         {p.imageUrl && (
-                          <img src={p.imageUrl} alt={p.name} className="h-10 w-10 object-cover" />
+                          <img
+                            src={p.imageUrl}
+                            alt={p.name}
+                            className="h-13 w-13 shrink-0 object-cover"
+                          />
                         )}
                       </TableHead>
                       <TableHead>{p.name}</TableHead>
@@ -91,9 +101,9 @@ function AdminProductsPage() {
                             {isExpanded ? "Hide sizes" : "Show sizes"}
                           </button>
                           <Link
+                            variant="action"
                             to="/admin/products/$productId"
                             params={{ productId: p.id }}
-                            className="font-heading text-[#6B4423] text-xs tracking-wider underline hover:text-[#3E2A1E]"
                           >
                             Edit
                           </Link>

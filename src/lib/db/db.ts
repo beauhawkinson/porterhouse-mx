@@ -6,4 +6,5 @@ import * as relations from "@/lib/db/relations";
 import * as schema from "@/lib/db/schema";
 
 const client = postgres(env.DATABASE_URL, { prepare: false });
+
 export const db = drizzle(client, { schema: { ...schema, ...relations } });
