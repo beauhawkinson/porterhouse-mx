@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { CATEGORY_LABELS } from "@/lib/products/category";
-import { Button } from "../ui/button";
 
 import type { Category } from "@/lib/db/schema";
 
