@@ -52,8 +52,7 @@ export const Route = createFileRoute("/api/stripe/webhook")({
               // Idempotency: skip if already paid
               if (existing.status === "paid") break;
 
-              const shippingDetails =
-                session.collected_information?.shipping_details ?? session.shipping_details;
+              const shippingDetails = session.collected_information?.shipping_details;
 
               await db.transaction(async (tx) => {
                 await tx
