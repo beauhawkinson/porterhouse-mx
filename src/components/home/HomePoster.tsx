@@ -9,9 +9,11 @@ import type { FeaturedProducts } from "./shared";
 export function HomePoster({
   products,
   featured,
+  preview,
 }: {
   products: FeaturedProducts;
   featured: FeaturedVariant;
+  preview: boolean;
 }) {
   return (
     <>
@@ -58,7 +60,7 @@ export function HomePoster({
       <Marquee items={["New drop", "Moto is life", "Limited runs", "Ride or die", "Gate drop"]} />
 
       <div className="mt-24">
-        <FeaturedShowcase products={products} variant={featured} />
+        <FeaturedShowcase products={products} variant={featured} preview={preview} />
       </div>
 
       <section className="mx-auto max-w-3xl border-border border-t px-6 pt-28 pb-32 text-center">

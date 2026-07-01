@@ -24,22 +24,31 @@ const label = (category: string) => CATEGORY_LABELS[category as Category] ?? cat
 export function FeaturedShowcase({
   products,
   variant,
+  preview = false,
 }: {
   products: FeaturedProducts;
   variant: FeaturedVariant;
+  /** Layout-only preview (fake products) — render fully non-interactive. */
+  preview?: boolean;
 }) {
   if (products.length === 0) return null;
 
-  switch (variant) {
-    case "spotlight":
-      return <Spotlight products={products} />;
-    case "rail":
-      return <Rail products={products} />;
-    case "editorial":
-      return <Editorial products={products} />;
-    default:
-      return <Grid products={products} />;
-  }
+  const content = (() => {
+    switch (variant) {
+      case "spotlight":
+        return <Spotlight products={products} />;
+      case "rail":
+        return <Rail products={products} />;
+      case "editorial":
+        return <Editorial products={products} />;
+      default:
+        return <Grid products={products} />;
+    }
+  })();
+
+  // Preview products aren't in the DB, so navigating to them would 404. Disable
+  // all interaction so the section reads as a pure layout demo.
+  return preview ? <div className="pointer-events-none select-none">{content}</div> : content;
 }
 
 // ── Section heading, shared ─────────────────────────────────────────────────

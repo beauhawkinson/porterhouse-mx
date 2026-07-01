@@ -9,9 +9,11 @@ import type { FeaturedProducts } from "./shared";
 export function HomePulse({
   products,
   featured,
+  preview,
 }: {
   products: FeaturedProducts;
   featured: FeaturedVariant;
+  preview: boolean;
 }) {
   return (
     <>
@@ -60,7 +62,7 @@ export function HomePulse({
         <p className="text-foreground/80 text-lg leading-relaxed sm:text-xl">{ABOUT_JEREMY}</p>
       </section>
 
-      <FeaturedShowcase products={products} variant={featured} />
+      <FeaturedShowcase products={products} variant={featured} preview={preview} />
     </>
   );
 }
