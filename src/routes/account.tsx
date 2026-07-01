@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { Check, ChevronDown, Copy } from "lucide-react";
 import { Fragment, useState } from "react";
 
@@ -52,6 +52,7 @@ function formatCents(cents: number | null) {
 
 function AccountPage() {
   const { user, orders } = Route.useLoaderData();
+  const { hasProducts } = useRouteContext({ from: "__root__" });
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) => {
@@ -103,7 +104,7 @@ function AccountPage() {
             <p className="mb-6 text-[#666] text-sm">
               Orders you place while signed in will appear here.
             </p>
-            <Link to="/shop">Shop now</Link>
+            {hasProducts && <Link to="/shop">Shop now</Link>}
           </div>
         ) : (
           <Table>

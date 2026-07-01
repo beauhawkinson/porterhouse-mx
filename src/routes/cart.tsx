@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { CartItemRow } from "@/components/cart/CartItem";
@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import { useSession } from "@/lib/auth-client";
 import { cartKey, useCartStore } from "@/lib/cart/store";
+import { app } from "@/lib/config/app.config";
 import { createCheckoutSession } from "@/lib/server/checkout";
 
 export const Route = createFileRoute("/cart")({
+  // No products means nothing can be in the cart — block direct navigation.
+  beforeLoad: ({ context }) => {
+    if (!context.hasProducts) throw redirect({ to: "/" });
+  },
   component: CartPage,
 });
 
@@ -22,7 +27,13 @@ function CartPage() {
     style: "currency",
     currency: "USD",
   });
-  const shipping = "$8.00";
+  const shipping =
+    app.shippingCents === 0
+      ? "Free"
+      : (app.shippingCents / 100).toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
 
   const handleCheckout = async () => {
     setIsLoading(true);
@@ -83,7 +94,10 @@ function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#666]">Shipping</span>
-                <span className="text-[#888]">{shipping} (USPS)</span>
+                <span className="text-[#888]">
+                  {shipping}
+                  {app.shippingCents > 0 && " (USPS)"}
+                </span>
               </div>
               <div className="flex justify-between text-[#999] text-xs">
                 <span>Taxes calculated at checkout</span>
@@ -95,7 +109,9 @@ function CartPage() {
                 <span>Estimated Total</span>
                 <span>{subtotal}</span>
               </div>
-              <p className="mt-1 text-[#999] text-xs">+ $8 shipping + tax</p>
+              <p className="mt-1 text-[#999] text-xs">
+                {app.shippingCents > 0 ? `+ ${shipping} shipping + tax` : "+ tax"}
+              </p>
             </div>
 
             {error && (

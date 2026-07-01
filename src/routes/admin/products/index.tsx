@@ -12,6 +12,24 @@ export const Route = createFileRoute("/admin/products/")({
 
 const SIZE_ORDER = ["S", "M", "L", "XL", "XXL"];
 
+const STATUS_STYLES: Record<string, string> = {
+  active: "bg-green-100 text-green-800",
+  draft: "bg-amber-100 text-amber-800",
+  archived: "bg-gray-200 text-gray-600",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={`inline-block rounded-full px-2 py-0.5 font-medium text-xs capitalize ${
+        STATUS_STYLES[status] ?? "bg-gray-200 text-gray-600"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
+
 function AdminProductsPage() {
   const products = Route.useLoaderData();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -46,6 +64,7 @@ function AdminProductsPage() {
                 <TableHead className="w-auto px-4 py-2" />
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Total Stock</TableHead>
                 <TableHead className="px-4 py-2" />
@@ -72,6 +91,9 @@ function AdminProductsPage() {
                       </TableHead>
                       <TableHead>{p.name}</TableHead>
                       <TableHead>{p.category}</TableHead>
+                      <TableHead>
+                        <StatusBadge status={p.status} />
+                      </TableHead>
                       <TableHead>
                         {(p.priceCents / 100).toLocaleString("en-US", {
                           style: "currency",
@@ -112,7 +134,7 @@ function AdminProductsPage() {
                     </TableRow>
                     {isExpanded && (
                       <TableRow key={`${p.id}-variants`} className="bg-[#f5f0eb]">
-                        <td colSpan={6} className="px-8 py-3">
+                        <td colSpan={7} className="px-8 py-3">
                           <div className="flex flex-wrap gap-4">
                             {sortedVariants.map((v) => (
                               <div key={v.id} className="text-sm">

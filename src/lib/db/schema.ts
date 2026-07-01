@@ -167,6 +167,8 @@ export const order = pgTable("order", {
   fulfillmentStatus: fulfillmentStatusEnum("fulfillment_status").notNull().default("unfulfilled"),
   trackingNumber: text("tracking_number"),
   trackingCarrier: text("tracking_carrier"),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  refundedAt: timestamp("refunded_at", { withTimezone: true }),
   fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
   shippedAt: timestamp("shipped_at", { withTimezone: true }),
   internalNotes: text("internal_notes"),

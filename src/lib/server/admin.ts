@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { totalStock } from "@/lib/products/stock";
 import { checkIsAdmin, requireAdmin } from "@/lib/server/admin-guard";
+import { deleteR2Object } from "@/lib/server/r2-object";
 
 // ─── Auth check (used by navbar / root route) ────────────────────────────────
 
@@ -159,6 +160,45 @@ export const updateOrderNotesFn = createServerFn({ method: "POST" })
       .where(eq(order.id, data.orderId));
   });
 
+// Refund an order via the Stripe API and mark it refunded in one step, so the
+// admin can process refunds in-app without the Stripe Dashboard. The
+// charge.refunded webhook is a backup reconciliation path (it skips orders
+// already refunded here).
+export const refundOrderFn = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ orderId: z.uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    await requireAdmin(getRequest());
+
+    const existing = await db.query.order.findFirst({ where: eq(order.id, data.orderId) });
+    if (!existing) throw new Error("Order not found.");
+    if (existing.status === "refunded") throw new Error("Order is already refunded.");
+    if (existing.status !== "paid") throw new Error("Only paid orders can be refunded.");
+    if (!existing.stripePaymentIntentId) {
+      throw new Error("No Stripe payment on this order to refund.");
+    }
+
+    // Issue the refund with Stripe first — only mark the order refunded if it
+    // actually succeeds, so the DB never lies about money movement. The
+    // idempotency key makes a retried/double-clicked request safe (Stripe
+    // returns the original refund instead of creating a second one).
+    await stripeClient.refunds.create(
+      { payment_intent: existing.stripePaymentIntentId },
+      { idempotencyKey: `refund_${existing.id}` },
+    );
+
+    const now = new Date();
+    const [updated] = await db
+      .update(order)
+      .set({ status: "refunded", refundedAt: now, updatedAt: now })
+      .where(eq(order.id, data.orderId))
+      .returning();
+
+    // Inventory is intentionally not auto-restocked — the admin adjusts stock
+    // manually (Stock by size) based on whether the item is actually coming
+    // back (unshipped vs. shipped/damaged/kept).
+    return updated ?? null;
+  });
+
 // ─── Dashboard stats ──────────────────────────────────────────────────────────
 
 export const getDashboardStatsFn = createServerFn({ method: "GET" }).handler(async () => {
@@ -220,7 +260,10 @@ export const getAdminProductFn = createServerFn({ method: "GET" })
 
     const p = await db.query.product.findFirst({
       where: eq(product.id, productId),
-      with: { variants: true },
+      with: {
+        variants: true,
+        images: { orderBy: asc(productImage.sortOrder) },
+      },
     });
 
     return p ?? null;
@@ -236,7 +279,12 @@ const updateProductSchema = z.object({
   description: z.string().min(1).optional(),
   details: z.string().optional().nullable(),
   priceCents: z.number().int().min(1).optional(),
-  imageUrl: z.string().min(1).optional(),
+  // Full ordered gallery. When present it replaces the product's images; the
+  // first entry becomes the primary (mirrored onto product.imageUrl).
+  images: z
+    .array(z.object({ url: z.string().min(1), alt: z.string().optional() }))
+    .min(1)
+    .optional(),
   category: z.enum(categoryEnum.enumValues).optional(),
   status: z.enum(["draft", "active", "archived"]).optional(),
   stock: z.number().int().min(0).optional(),
@@ -260,7 +308,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
     if (data.name !== undefined) updates.name = data.name;
     if (data.description !== undefined) updates.description = data.description;
     if (data.details !== undefined) updates.details = data.details;
-    if (data.imageUrl !== undefined) updates.imageUrl = data.imageUrl;
+    if (data.images !== undefined) updates.imageUrl = data.images[0].url;
     if (data.category !== undefined) updates.category = data.category;
     if (data.status !== undefined) updates.status = data.status;
     if (data.priceCents !== undefined) updates.priceCents = data.priceCents;
@@ -339,6 +387,37 @@ export const updateProductFn = createServerFn({ method: "POST" })
       .set(updates)
       .where(eq(product.id, data.productId))
       .returning();
+
+    // ──────────────────────────────────────────────────────────────
+    // Gallery replacement — the productImage rows are what the storefront
+    // reads, so rewrite them to match the submitted gallery and clean up
+    // any R2 objects for images that were removed.
+    // ──────────────────────────────────────────────────────────────
+    if (data.images !== undefined) {
+      const newUrls = new Set(data.images.map((img) => img.url));
+
+      const oldImages = await db
+        .select({ url: productImage.url })
+        .from(productImage)
+        .where(eq(productImage.productId, existing.id));
+
+      await db.delete(productImage).where(eq(productImage.productId, existing.id));
+      await db.insert(productImage).values(
+        data.images.map((img, idx) => ({
+          productId: existing.id,
+          url: img.url,
+          alt: img.alt?.trim() || data.name || existing.name,
+          sortOrder: idx,
+        })),
+      );
+
+      // Best-effort delete of dropped files (no-op for non-R2 URLs).
+      for (const old of oldImages) {
+        if (!newUrls.has(old.url)) {
+          await deleteR2Object(old.url);
+        }
+      }
+    }
 
     return updated ?? null;
   });
@@ -503,7 +582,7 @@ export const createProductFn = createServerFn({ method: "POST" })
           description: data.description,
           details: data.details ?? null,
           priceCents: data.priceCents,
-          imageUrl: data.imageUrl,
+          imageUrl: data.images[0].url,
           category: data.category,
           status: data.status,
           stripeProductId,
@@ -531,14 +610,16 @@ export const createProductFn = createServerFn({ method: "POST" })
       }
 
       // ────────────────────────────────────────────────────────────────
-      // 6. Insert primary product image
+      // 6. Insert product images (ordered gallery; first = primary)
       // ────────────────────────────────────────────────────────────────
-      await db.insert(productImage).values({
-        productId: row.id,
-        url: data.imageUrl,
-        alt: data.name,
-        sortOrder: 0,
-      });
+      await db.insert(productImage).values(
+        data.images.map((img, idx) => ({
+          productId: row.id,
+          url: img.url,
+          alt: img.alt?.trim() || data.name,
+          sortOrder: idx,
+        })),
+      );
 
       return { id: row.id, slug: row.slug };
     } catch (err) {

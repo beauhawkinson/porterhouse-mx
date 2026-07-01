@@ -28,7 +28,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderFn, updateFulfillmentFn, updateOrderNotesFn } from "@/lib/server/admin";
+import {
+  getOrderFn,
+  refundOrderFn,
+  updateFulfillmentFn,
+  updateOrderNotesFn,
+} from "@/lib/server/admin";
 
 export const Route = createFileRoute("/admin/orders/$orderId")({
   loader: ({ params }) => getOrderFn({ data: params.orderId }),
@@ -101,7 +106,10 @@ function OrderDetailPage() {
   const [order, setOrder] = useState(initialOrder);
   const [showShipModal, setShowShipModal] = useState(false);
   const [showRevertConfirm, setShowRevertConfirm] = useState(false);
+  const [showRefundConfirm, setShowRefundConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [refunding, setRefunding] = useState(false);
+  const [refundError, setRefundError] = useState("");
   const [notes, setNotes] = useState(order?.internalNotes ?? "");
   const [notesSaving, setNotesSaving] = useState(false);
   const [tracking, setTracking] = useState("");
@@ -142,6 +150,20 @@ function OrderDetailPage() {
       await updateOrderNotesFn({ data: { orderId: order!.id, notes } });
     } finally {
       setNotesSaving(false);
+    }
+  }
+
+  async function handleRefund() {
+    setRefundError("");
+    setRefunding(true);
+    try {
+      const updated = await refundOrderFn({ data: { orderId: order!.id } });
+      if (updated) setOrder({ ...order!, ...updated });
+      setShowRefundConfirm(false);
+    } catch (err) {
+      setRefundError(err instanceof Error ? err.message : "Refund failed. Please try again.");
+    } finally {
+      setRefunding(false);
     }
   }
 
@@ -232,6 +254,33 @@ function OrderDetailPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Refund Confirm Dialog */}
+      <Dialog open={showRefundConfirm} onOpenChange={setShowRefundConfirm}>
+        <DialogContent side="center">
+          <DialogHeader>
+            <DialogTitle>Refund this order?</DialogTitle>
+          </DialogHeader>
+          <p className="text-secondary-foreground text-sm">
+            This issues a full refund through Stripe for{" "}
+            <strong>
+              {order.amountTotalCents ? formatCents(order.amountTotalCents) : "this order"}
+            </strong>{" "}
+            and marks the order as refunded. This cannot be undone.
+          </p>
+          {refundError && <p className="text-red-600 text-sm">{refundError}</p>}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button size="sm" variant="ghost">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button size="sm" disabled={refunding} onClick={handleRefund}>
+              {refunding ? "Refunding…" : "Refund order"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {isRefunded && (
         <div className="border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">
           <strong>Warning:</strong> This order has been refunded. Do not ship.
@@ -304,11 +353,17 @@ function OrderDetailPage() {
             <TimelineRow
               label="Paid"
               value={
-                order.status === "paid" || order.status === "fulfilled"
-                  ? formatDate(order.updatedAt)
-                  : "—"
+                order.paidAt
+                  ? formatDate(order.paidAt)
+                  : // Fallback for orders paid before paidAt was tracked.
+                    order.status === "paid" || order.status === "refunded"
+                    ? formatDate(order.updatedAt)
+                    : "—"
               }
             />
+            {order.refundedAt && (
+              <TimelineRow label="Refunded" value={formatDate(order.refundedAt)} />
+            )}
             <TimelineRow label="Fulfilled" value={formatDate(order.fulfilledAt)} />
             <TimelineRow label="Shipped" value={formatDate(order.shippedAt)} />
             {order.trackingNumber && (
@@ -367,6 +422,36 @@ function OrderDetailPage() {
           )}
         </div>
       </section>
+
+      {/* Payment actions */}
+      <InfoCard title="Payment">
+        {order.status === "refunded" ? (
+          <p className="text-secondary-foreground text-sm">
+            Refunded{order.refundedAt ? ` on ${formatDate(order.refundedAt)}` : ""}.
+          </p>
+        ) : order.status === "paid" ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={refunding}
+              onClick={() => {
+                setRefundError("");
+                setShowRefundConfirm(true);
+              }}
+            >
+              Refund order
+            </Button>
+            <span className="text-faded-foreground text-xs">
+              Issues a full refund through Stripe.
+            </span>
+          </div>
+        ) : (
+          <p className="text-secondary-foreground text-sm">
+            Awaiting payment — no charge to refund yet.
+          </p>
+        )}
+      </InfoCard>
 
       {/* Fulfillment actions */}
       <InfoCard title="Fulfillment">

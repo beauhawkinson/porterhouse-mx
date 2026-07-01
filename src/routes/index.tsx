@@ -46,20 +46,18 @@ function HomePage() {
         </p>
       </section>
 
-      <section className="mx-auto mb-32 max-w-6xl px-4 py-12 sm:px-6">
-        <div className="mb-12 flex items-end justify-between">
-          <h2 className="font-moto_is_life text-5xl sm:text-7xl">Featured</h2>
-          <Link to="/shop" variant="section" size="none">
-            Shop all →
-          </Link>
-        </div>
-
-        {products.length === 0 ? (
-          <div className="py-24 text-center text-[#999]">
-            <p className="font-heading text-2xl">No Products Found</p>
+      {/* Featured — hidden entirely when there are no products so the section
+          heading and its large spacing don't leave an awkward empty gap. */}
+      {products.length > 0 && (
+        <section className="mx-auto mb-32 max-w-6xl px-4 py-12 sm:px-6">
+          <div className="mb-12 flex items-end justify-between">
+            <h2 className="font-moto_is_life text-5xl sm:text-7xl">Featured</h2>
+            <Link to="/shop" variant="section" size="none">
+              Shop all →
+            </Link>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2">
             {products.map((p) => (
               <ProductCard
                 key={p.id}
@@ -73,8 +71,8 @@ function HomePage() {
               />
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </>
   );
 }

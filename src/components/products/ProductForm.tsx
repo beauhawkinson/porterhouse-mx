@@ -1,5 +1,5 @@
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { ArrowDown, ArrowUp, ChevronDown, Star, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CATEGORY_LABELS } from "@/lib/products/category";
+import { UPLOAD_ACCEPT, UPLOAD_MAX_SIZE } from "@/lib/products/upload-constants";
+import { uploadProductImageFn } from "@/lib/server/uploads";
 
 import type { Category, ProductStatus } from "@/lib/db/schema";
 
 // ─── Schema ──────────────────────────────────────────────────────────────
+
+const productImageSchema = z.object({
+  url: z.string().min(1),
+  alt: z.string().optional(),
+});
+
+export type ProductImageInput = z.infer<typeof productImageSchema>;
 
 export const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   details: z.string().optional(),
   priceCents: z.number().int().min(1, "Price must be at least 1 cent"),
-  imageUrl: z.string().min(1, "Image URL is required"),
+  // Ordered gallery. The first image is the primary one used on cards, the
+  // cart, and Stripe Checkout (mirrored onto product.imageUrl by the server).
+  images: z.array(productImageSchema).min(1, "At least one image is required"),
   category: z.enum(["tshirt", "sweatshirt", "sticker"]),
   status: z.enum(["draft", "active", "archived"]),
   // Only meaningful for stickers; ignored by the server for apparel.
@@ -62,7 +73,7 @@ export function ProductForm({
     description: initialValues?.description ?? "",
     details: initialValues?.details ?? "",
     priceDollars: initialValues?.priceCents ? (initialValues.priceCents / 100).toFixed(2) : "",
-    imageUrl: initialValues?.imageUrl ?? "",
+    images: (initialValues?.images ?? []) as ProductImageInput[],
     category: (initialValues?.category ?? "tshirt") as Category,
     status: (initialValues?.status ?? "draft") as ProductStatus,
     stock: initialValues?.stock ?? 0,
@@ -70,6 +81,7 @@ export function ProductForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const isSticker = form.category === "sticker";
   const priceCents = Math.round(parseFloat(form.priceDollars) * 100);
@@ -77,6 +89,16 @@ export function ProductForm({
     originalPriceCents !== undefined &&
     !Number.isNaN(priceCents) &&
     originalPriceCents !== priceCents;
+
+  function setImages(next: ProductImageInput[]) {
+    setForm((p) => ({ ...p, images: next }));
+    if (next.length > 0) {
+      setErrors((prev) => {
+        const { images: _removed, ...rest } = prev;
+        return rest;
+      });
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,7 +110,7 @@ export function ProductForm({
       description: form.description,
       details: form.details || undefined,
       priceCents,
-      imageUrl: form.imageUrl,
+      images: form.images,
       category: form.category,
       status: form.status,
       stock: isSticker ? form.stock : undefined,
@@ -123,6 +145,7 @@ export function ProductForm({
         <Input
           type="text"
           value={form.name}
+          placeholder="e.g. Moto Is Life Tee"
           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
         />
       </Field>
@@ -132,6 +155,7 @@ export function ProductForm({
           value={form.description}
           onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
           rows={3}
+          placeholder="Short description shown on the product page."
           className="w-full border border-border bg-background px-3 py-2 text-foreground text-sm placeholder:text-faded-foreground focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
         />
       </Field>
@@ -156,6 +180,7 @@ export function ProductForm({
           step="0.01"
           min="0.01"
           value={form.priceDollars}
+          placeholder="0.00"
           onChange={(e) => setForm((p) => ({ ...p, priceDollars: e.target.value }))}
         />
         {priceChanged && (
@@ -165,12 +190,12 @@ export function ProductForm({
         )}
       </Field>
 
-      <Field label="Image URL" error={errors.imageUrl}>
-        <Input
-          type="text"
-          value={form.imageUrl}
-          onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-        />
+      <Field
+        label="Product images"
+        error={errors.images}
+        hint="Upload JPEG, PNG, or WebP (max 5MB each). The first image is the primary one shown on cards and checkout — reorder to change it."
+      >
+        <ImageManager images={form.images} onChange={setImages} onUploadingChange={setUploading} />
       </Field>
 
       <Field label="Category" error={errors.category}>
@@ -237,7 +262,7 @@ export function ProductForm({
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" size="sm" disabled={saving}>
+        <Button type="submit" size="sm" disabled={saving || uploading}>
           {saving ? "Saving…" : submitLabel}
         </Button>
         {saveMsg && (
@@ -249,6 +274,189 @@ export function ProductForm({
         )}
       </div>
     </form>
+  );
+}
+
+// ─── Image manager ─────────────────────────────────────────────────────────
+
+function ImageManager({
+  images,
+  onChange,
+  onUploadingChange,
+}: {
+  images: ProductImageInput[];
+  onChange: (images: ProductImageInput[]) => void;
+  onUploadingChange: (uploading: boolean) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function setBusy(busy: boolean) {
+    setUploading(busy);
+    onUploadingChange(busy);
+  }
+
+  async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    // Reset so selecting the same file(s) again still fires onChange.
+    e.target.value = "";
+    if (files.length === 0) return;
+
+    setUploadError("");
+    setBusy(true);
+    try {
+      const uploaded: ProductImageInput[] = [];
+      for (const file of files) {
+        if (file.size > UPLOAD_MAX_SIZE) {
+          setUploadError(`"${file.name}" is larger than 5MB and was skipped.`);
+          continue;
+        }
+        const fd = new FormData();
+        fd.append("file", file);
+        const { url } = await uploadProductImageFn({ data: fd });
+        uploaded.push({ url, alt: "" });
+      }
+      if (uploaded.length > 0) onChange([...images, ...uploaded]);
+    } catch (err) {
+      console.error(err);
+      setUploadError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function move(index: number, dir: -1 | 1) {
+    const target = index + dir;
+    if (target < 0 || target >= images.length) return;
+    const next = [...images];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    onChange(next);
+  }
+
+  function makePrimary(index: number) {
+    if (index === 0) return;
+    const next = [...images];
+    const [item] = next.splice(index, 1);
+    next.unshift(item!);
+    onChange(next);
+  }
+
+  function remove(index: number) {
+    onChange(images.filter((_, i) => i !== index));
+  }
+
+  function setAlt(index: number, alt: string) {
+    onChange(images.map((img, i) => (i === index ? { ...img, alt } : img)));
+  }
+
+  return (
+    <div className="space-y-3">
+      {images.length > 0 && (
+        <ul className="space-y-2">
+          {images.map((img, idx) => (
+            <li
+              key={img.url}
+              className="flex items-start gap-3 border border-border bg-secondary/40 p-2"
+            >
+              <div className="relative size-16 shrink-0 overflow-hidden border border-border bg-secondary">
+                <img
+                  src={img.url}
+                  alt={img.alt || "Product image"}
+                  className="size-full object-cover"
+                />
+                {idx === 0 && (
+                  <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-primary/90 py-0.5 text-[10px] text-primary-foreground">
+                    <Star className="size-2.5 fill-current" />
+                    Primary
+                  </span>
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1 space-y-1">
+                <Input
+                  type="text"
+                  value={img.alt ?? ""}
+                  placeholder="Alt text (optional)"
+                  onChange={(e) => setAlt(idx, e.target.value)}
+                />
+                <p className="truncate text-[11px] text-faded-foreground">{img.url}</p>
+              </div>
+
+              <div className="flex shrink-0 flex-col gap-1">
+                <div className="flex gap-1">
+                  <IconButton label="Move up" disabled={idx === 0} onClick={() => move(idx, -1)}>
+                    <ArrowUp className="size-3.5" />
+                  </IconButton>
+                  <IconButton
+                    label="Move down"
+                    disabled={idx === images.length - 1}
+                    onClick={() => move(idx, 1)}
+                  >
+                    <ArrowDown className="size-3.5" />
+                  </IconButton>
+                </div>
+                <div className="flex gap-1">
+                  {idx !== 0 && (
+                    <IconButton label="Make primary" onClick={() => makePrimary(idx)}>
+                      <Star className="size-3.5" />
+                    </IconButton>
+                  )}
+                  <IconButton label="Remove image" onClick={() => remove(idx)}>
+                    <X className="size-3.5" />
+                  </IconButton>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={UPLOAD_ACCEPT}
+        multiple
+        className="hidden"
+        onChange={handleFiles}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={uploading}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        {uploading ? "Uploading…" : images.length > 0 ? "Add more images" : "Upload images"}
+      </Button>
+
+      {uploadError && <p className="text-red-600 text-xs">{uploadError}</p>}
+    </div>
+  );
+}
+
+function IconButton({
+  label,
+  disabled,
+  onClick,
+  children,
+}: {
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex size-7 items-center justify-center border border-border bg-background text-secondary-foreground transition-colors hover:border-primary disabled:pointer-events-none disabled:opacity-40"
+    >
+      {children}
+    </button>
   );
 }
 

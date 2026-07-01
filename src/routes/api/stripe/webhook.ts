@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/suspicious/noConsole: Allow */
 import { createFileRoute } from "@tanstack/react-router";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
@@ -33,6 +33,16 @@ export const Route = createFileRoute("/api/stripe/webhook")({
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
 
+              // Only act on sessions that actually completed payment. Standard
+              // card checkout is always "paid" here, but delayed-notification
+              // methods can complete as "unpaid"/"no_payment_required".
+              if (session.payment_status !== "paid") {
+                console.log(
+                  `checkout.session.completed: payment_status=${session.payment_status}, skipping`,
+                );
+                break;
+              }
+
               const orderInternalId = session.metadata?.orderInternalId;
 
               if (!orderInternalId) {
@@ -59,6 +69,7 @@ export const Route = createFileRoute("/api/stripe/webhook")({
                   .update(order)
                   .set({
                     status: "paid",
+                    paidAt: new Date(),
                     stripePaymentIntentId:
                       typeof session.payment_intent === "string"
                         ? session.payment_intent
@@ -111,10 +122,17 @@ export const Route = createFileRoute("/api/stripe/webhook")({
                   : charge.payment_intent?.id;
 
               if (paymentIntentId) {
+                // Skip orders already refunded (e.g. via the in-app refund
+                // action) so we don't clobber the original refundedAt time.
                 await db
                   .update(order)
-                  .set({ status: "refunded", updatedAt: new Date() })
-                  .where(eq(order.stripePaymentIntentId, paymentIntentId));
+                  .set({ status: "refunded", refundedAt: new Date(), updatedAt: new Date() })
+                  .where(
+                    and(
+                      eq(order.stripePaymentIntentId, paymentIntentId),
+                      ne(order.status, "refunded"),
+                    ),
+                  );
                 console.log(`Order with PI ${paymentIntentId} marked as refunded.`);
               }
               break;

@@ -58,7 +58,12 @@ function ProductDetailPage() {
 
   const remaining = Math.max(0, lineStock - inCart);
 
-  const canAdd = variantLess ? remaining > 0 : !!selectedVariant && remaining > 0;
+  // Only active products are purchasable. Draft/archived products can be opened
+  // by admins in preview mode, but must not be added to the cart.
+  const isPurchasable = product.status === "active";
+
+  const canAdd =
+    isPurchasable && (variantLess ? remaining > 0 : !!selectedVariant && remaining > 0);
 
   const handleAddToCart = () => {
     if (!canAdd) return;
@@ -91,20 +96,41 @@ function ProductDetailPage() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const buttonLabel = added
-    ? "Added to cart ✓"
-    : !variantLess && !selectedVariantId
-      ? "Select a size"
-      : lineStock === 0
-        ? "Out of stock"
-        : remaining === 0
-          ? "Max in cart"
-          : "Add to cart";
+  const buttonLabel = !isPurchasable
+    ? "Not available in preview"
+    : added
+      ? "Added to cart ✓"
+      : !variantLess && !selectedVariantId
+        ? "Select a size"
+        : lineStock === 0
+          ? "Out of stock"
+          : remaining === 0
+            ? "Max in cart"
+            : "Add to cart";
 
   const hasMultipleImages = product.images.length > 1;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      {/* Admin-only preview banner — non-active products are hidden from the
+          public but reachable by admins to preview before going live. */}
+      {product.status !== "active" && (
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900 text-sm">
+          <span>
+            <strong>{product.status === "draft" ? "Draft preview" : "Archived product"}</strong> —
+            not visible to customers. Only admins can see this page.
+          </span>
+          <Link
+            to="/admin/products/$productId"
+            params={{ productId: product.id }}
+            variant="inline"
+            size="none"
+          >
+            Edit product →
+          </Link>
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"

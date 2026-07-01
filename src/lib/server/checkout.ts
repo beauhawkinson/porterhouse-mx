@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
+import { app } from "@/lib/config/app.config";
 import { stripeClient } from "@/lib/config/stripe.config";
 import { env } from "@/lib/config/t3.config";
 import { db } from "@/lib/db/db";
@@ -57,6 +58,18 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     }
     if (products.length !== productIdsWithoutVariant.length) {
       throw new Error("One or more products not found.");
+    }
+
+    // Guard: only active products can be purchased. Draft/archived products are
+    // visible to admins in preview mode but must never be added to an order or
+    // checked out — this is the authoritative check (the client is bypassable).
+    for (const line of data.lines) {
+      const status = line.variantId
+        ? variants.find((v) => v.id === line.variantId)?.product.status
+        : products.find((p) => p.id === line.productId)?.status;
+      if (status !== "active") {
+        throw new Error("This product is not available for purchase.");
+      }
     }
 
     // Validate stock for every line.
@@ -173,7 +186,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         {
           shipping_rate_data: {
             type: "fixed_amount",
-            fixed_amount: { amount: 800, currency: "usd" },
+            fixed_amount: { amount: app.shippingCents, currency: "usd" },
             display_name: "USPS Ground Advantage",
             delivery_estimate: {
               minimum: { unit: "business_day", value: 5 },

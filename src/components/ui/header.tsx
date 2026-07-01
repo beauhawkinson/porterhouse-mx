@@ -11,7 +11,7 @@ import { app } from "@/lib/config/app.config";
 const Header = () => {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
-  const { isAdmin } = useRouteContext({ from: "__root__" });
+  const { isAdmin, hasProducts } = useRouteContext({ from: "__root__" });
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeMobile = () => setMobileOpen(false);
@@ -59,9 +59,11 @@ const Header = () => {
 
         {/* Center: nav (desktop) */}
         <nav className="hidden items-center justify-center gap-8 justify-self-center md:flex">
-          <Link to="/shop" variant="nav" size="none">
-            Shop
-          </Link>
+          {hasProducts && (
+            <Link to="/shop" variant="nav" size="none">
+              Shop
+            </Link>
+          )}
 
           {isAdmin && session && (
             <Link to="/admin" variant="nav" size="none">
@@ -86,22 +88,27 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Right: cart */}
-        <Link
-          to="/cart"
-          onClick={closeMobile}
-          variant="unstyled"
-          size="none"
-          className="group relative justify-self-end text-foreground hover:text-primary"
-          aria-label={`Cart${totalItems > 0 ? `, ${totalItems} item${totalItems === 1 ? "" : "s"}` : ""}`}
-        >
-          <ShoppingCart />
-          {totalItems > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-foreground font-bold text-background text-xs">
-              {totalItems > 9 ? "9+" : totalItems}
-            </span>
-          )}
-        </Link>
+        {/* Right: cart — hidden when there's nothing to buy */}
+        {hasProducts ? (
+          <Link
+            to="/cart"
+            onClick={closeMobile}
+            variant="unstyled"
+            size="none"
+            className="group relative justify-self-end text-foreground hover:text-primary"
+            aria-label={`Cart${totalItems > 0 ? `, ${totalItems} item${totalItems === 1 ? "" : "s"}` : ""}`}
+          >
+            <ShoppingCart />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-foreground font-bold text-background text-xs">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
+          </Link>
+        ) : (
+          // Keep the grid's third column so the logo/nav stay centered.
+          <span aria-hidden className="justify-self-end" />
+        )}
       </div>
 
       {/* Mobile nav panel */}
@@ -112,9 +119,11 @@ const Header = () => {
         }`}
       >
         <nav className="mx-auto flex max-w-7xl flex-col px-4 py-2 sm:px-6">
-          <Link to="/shop" onClick={closeMobile} variant="nav-mobile" size="none">
-            Shop
-          </Link>
+          {hasProducts && (
+            <Link to="/shop" onClick={closeMobile} variant="nav-mobile" size="none">
+              Shop
+            </Link>
+          )}
 
           {isAdmin && session && (
             <Link to="/admin" onClick={closeMobile} variant="nav-mobile" size="none">
