@@ -8,7 +8,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(32),
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
-    STRIPE_SECRET_KEY: z.string().startsWith("sk_"),
+    STRIPE_SECRET_KEY: z.string().regex(/^(sk|rk)_(test|live)_/),
     STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_"),
     ADMIN_EMAILS: z.string().min(1),
   },
