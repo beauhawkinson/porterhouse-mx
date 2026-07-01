@@ -2,6 +2,7 @@ import { useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { PreviewSwitcher } from "@/components/home/PreviewSwitcher";
 import { Button } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -110,6 +111,15 @@ const Header = () => {
           <span aria-hidden className="justify-self-end" />
         )}
       </div>
+
+      {/* Admin-only design preview bar (temporary testing tool) */}
+      {isAdmin && (
+        <div className="flex items-center border-border border-t bg-muted/50">
+          <div className="mx-auto flex w-full max-w-7xl items-center px-4 sm:px-6">
+            <PreviewSwitcher />
+          </div>
+        </div>
+      )}
 
       {/* Mobile nav panel */}
       <div

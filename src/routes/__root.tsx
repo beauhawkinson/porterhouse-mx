@@ -49,14 +49,17 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  // Admins get an extra header row (the home-design preview bar), so the main
+  // content needs more top padding to clear the taller fixed header.
+  const { isAdmin } = Route.useRouteContext();
   return (
-    <RootDocument>
+    <RootDocument isAdmin={isAdmin}>
       <Outlet />
     </RootDocument>
   );
 }
 
-function RootDocument({ children }: PropsWithChildren) {
+function RootDocument({ isAdmin, children }: PropsWithChildren<{ isAdmin: boolean }>) {
   return (
     <html lang="en">
       <head>
@@ -64,7 +67,9 @@ function RootDocument({ children }: PropsWithChildren) {
       </head>
       <body className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex flex-1 flex-col py-16">{children}</main>
+        <main className={`flex flex-1 flex-col pb-16 ${isAdmin ? "pt-48" : "pt-16"}`}>
+          {children}
+        </main>
         <Footer />
         <Scripts />
       </body>

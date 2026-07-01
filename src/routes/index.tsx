@@ -1,78 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 
-import { ProductCard } from "@/components/products/ProductCard";
-import Link from "@/components/ui/link";
-import { app } from "@/lib/config/app.config";
-import { hasStock } from "@/lib/products/stock";
+import { DEFAULT_FEATURED_VARIANT, FEATURED_VARIANTS } from "@/components/home/featured-variants";
+import { HomeEditorial } from "@/components/home/HomeEditorial";
+import { HomeOriginal } from "@/components/home/HomeOriginal";
+import { HomePoster } from "@/components/home/HomePoster";
+import { HomePulse } from "@/components/home/HomePulse";
+import { DEFAULT_HOME_VARIANT, HOME_VARIANTS } from "@/components/home/variants";
 import { getFeaturedProducts } from "@/lib/server/products";
 
+const searchSchema = z.object({
+  // Design-preview selectors. Invalid values fall back to their defaults.
+  v: z.enum(HOME_VARIANTS).catch(DEFAULT_HOME_VARIANT).optional(),
+  f: z.enum(FEATURED_VARIANTS).catch(DEFAULT_FEATURED_VARIANT).optional(),
+});
+
 export const Route = createFileRoute("/")({
+  validateSearch: searchSchema,
   loader: () => getFeaturedProducts(),
   component: HomePage,
 });
 
 function HomePage() {
   const products = Route.useLoaderData();
+  const { v = DEFAULT_HOME_VARIANT, f = DEFAULT_FEATURED_VARIANT } = Route.useSearch();
 
-  return (
-    <>
-      {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
-        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-          <h1 className="z-50 mb-6 leading-[0.85] tracking-tight">
-            <span className="z-50 block whitespace-nowrap font-moto_is_life text-[89px] text-foreground sm:text-[144px]">
-              {app.brand.name}
-            </span>
-          </h1>
-          <br />
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link to="/shop" size="lg" className="group w-full active:scale-[0.99] sm:w-auto">
-              SHOP NOW
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-3xl px-6 pt-40 pb-80 text-center">
-        <h2 className="mb-8 font-moto_is_life text-5xl text-foreground leading-none sm:text-7xl">
-          About Jeremy
-        </h2>
-        <p className="text-foreground/80 text-lg leading-relaxed sm:text-xl">
-          Jeremy Porter has been chasing the next jump since he was old enough to twist a throttle.
-          What started as a kid tearing up backyard tracks turned into a relentless pursuit of every
-          starting gate he could line up behind — local hare scrambles, regional motos, and every
-          weekend in between. The bike, the dirt, the noise: it's the only place that's ever made
-          sense. This is the ride so far.
-        </p>
-      </section>
-
-      {/* Featured — hidden entirely when there are no products so the section
-          heading and its large spacing don't leave an awkward empty gap. */}
-      {products.length > 0 && (
-        <section className="mx-auto mb-32 max-w-6xl px-4 py-12 sm:px-6">
-          <div className="mb-12 flex items-end justify-between">
-            <h2 className="font-moto_is_life text-5xl sm:text-7xl">Featured</h2>
-            <Link to="/shop" variant="section" size="none">
-              Shop all →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2">
-            {products.map((p) => (
-              <ProductCard
-                key={p.id}
-                slug={p.slug}
-                name={p.name}
-                priceCents={p.priceCents}
-                imageUrl={p.imageUrl}
-                category={p.category}
-                hasStock={hasStock(p)}
-                images={p.images}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-    </>
-  );
+  switch (v) {
+    case "pulse":
+      return <HomePulse products={products} featured={f} />;
+    case "editorial":
+      return <HomeEditorial products={products} featured={f} />;
+    case "poster":
+      return <HomePoster products={products} featured={f} />;
+    default:
+      return <HomeOriginal products={products} featured={f} />;
+  }
 }
