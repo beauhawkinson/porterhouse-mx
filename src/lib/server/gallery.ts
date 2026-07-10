@@ -9,21 +9,6 @@ import { requireAdmin } from "@/lib/server/admin-guard";
 import { uploadImageToR2 } from "@/lib/server/image-upload";
 import { deleteR2Object } from "@/lib/server/r2-object";
 
-// ⚠️ TEMPORARY test content: shown only when the gallery table is empty so the
-// masonry grid isn't blank before any real uploads. Uses images already in
-// /public. These have no DB row, so they're display-only (not deletable) and
-// vanish as soon as a real image is uploaded.
-const TEST_IMAGES = [
-  "/images/products/moto-is-life-hoodie/action-1.jpeg",
-  "/images/products/moto-is-life-hoodie/paddock.jpeg",
-  "/images/products/checkered-flag-crewneck/front.jpeg",
-  "/images/products/moto-is-life-hoodie/action-2.jpeg",
-  "/images/products/porterhouse-script-sticker/on-helmet.jpeg",
-  "/images/products/moto-is-life-hoodie/back.jpeg",
-  "/images/products/checkered-flag-crewneck/detail.jpeg",
-  "/images/products/moto-is-life-hoodie/front.jpeg",
-];
-
 export type GalleryImage = { id: string | null; url: string };
 
 export const listGalleryImagesFn = createServerFn({ method: "GET" }).handler(
@@ -34,9 +19,6 @@ export const listGalleryImagesFn = createServerFn({ method: "GET" }).handler(
       orderBy: [asc(galleryImage.sortOrder), desc(galleryImage.createdAt)],
     });
 
-    if (rows.length === 0) {
-      return TEST_IMAGES.map((url) => ({ id: null, url }));
-    }
     return rows.map((r) => ({ id: r.id, url: r.url }));
   },
 );
@@ -46,9 +28,6 @@ export const listPublicGalleryImagesFn = createServerFn({ method: "GET" }).handl
   const rows = await db.query.galleryImage.findMany({
     orderBy: [asc(galleryImage.sortOrder), desc(galleryImage.createdAt)],
   });
-  if (rows.length === 0) {
-    return TEST_IMAGES.map((url) => ({ url, alt: "" }));
-  }
   return rows.map((r) => ({ url: r.url, alt: r.alt ?? "" }));
 });
 
