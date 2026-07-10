@@ -5,8 +5,6 @@ import { ProductRequest } from "./ProductRequest";
 
 import type { FeaturedProducts } from "./shared";
 
-const hoodie = (file: string) => `/images/${file}`;
-
 export function HomePulse({ products }: { products: FeaturedProducts }) {
   return (
     <div>
