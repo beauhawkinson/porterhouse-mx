@@ -25,6 +25,9 @@ function AdminLayout() {
           <Link to="/admin/products" variant="nav" size="none">
             Products
           </Link>
+          <Link to="/admin/gallery" variant="nav" size="none">
+            Gallery
+          </Link>
         </nav>
       </header>
       <Outlet />

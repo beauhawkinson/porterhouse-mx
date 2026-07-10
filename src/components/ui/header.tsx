@@ -75,6 +75,10 @@ const Header = () => {
             </Link>
           )}
 
+          <Link to="/gallery" variant="nav" size="none">
+            Gallery
+          </Link>
+
           {isAdmin && session && (
             <Link to="/admin" variant="nav" size="none">
               Admin
@@ -134,6 +138,10 @@ const Header = () => {
               Shop
             </Link>
           )}
+
+          <Link to="/gallery" onClick={closeMobile} variant="nav-mobile" size="none">
+            Gallery
+          </Link>
 
           {isAdmin && session && (
             <Link to="/admin" onClick={closeMobile} variant="nav-mobile" size="none">

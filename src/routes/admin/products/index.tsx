@@ -116,11 +116,7 @@ function AdminProductsPage() {
                       </TableHead>
                       <TableHead>
                         <div className="flex items-center gap-3">
-                          <Button
-                            variant="muted"
-                            size="none"
-                            onClick={() => toggle(p.id)}
-                          >
+                          <Button variant="muted" size="none" onClick={() => toggle(p.id)}>
                             {isExpanded ? "Hide sizes" : "Show sizes"}
                           </Button>
                           <Link

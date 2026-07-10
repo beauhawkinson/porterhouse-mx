@@ -11,8 +11,7 @@
     "db:generate": "bun run --env-file .env.local drizzle-kit generate",
     "db:migrate": "bun run --env-file .env.local drizzle-kit migrate",
     "db:studio": "bun run --env-file .env.local drizzle-kit studio",
-    "db:push": "bun run --env-file .env.local drizzle-kit push",
-    "db:seed": "bun run src/lib/db/seed.ts"
+    "db:push": "bun run --env-file .env.local drizzle-kit push"
   },
   "dependencies": {
     "@better-auth/stripe": "^1.2.7",

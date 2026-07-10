@@ -224,7 +224,7 @@ function AdminOrdersPage() {
                       params={{ orderId: o.id }}
                       variant="unstyled"
                       size="none"
-                      className="rounded-sm text-foreground underline underline-offset-4 decoration-border hover:text-primary hover:decoration-primary"
+                      className="rounded-sm text-foreground underline decoration-border underline-offset-4 hover:text-primary hover:decoration-primary"
                     >
                       {o.customerEmail ?? "—"}
                     </Link>

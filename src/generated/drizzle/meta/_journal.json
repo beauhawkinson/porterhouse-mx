@@ -71,6 +71,13 @@
       "when": 1783696164003,
       "tag": "0009_chunky_praxagora",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783715214394,
+      "tag": "0010_tense_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }

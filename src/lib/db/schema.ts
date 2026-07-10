@@ -216,3 +216,15 @@ export const productRequest = pgTable("product_request", {
   status: productRequestStatusEnum("status").notNull().default("open"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ─── Gallery ────────────────────────────────────────────────────────────────
+// Admin-managed image gallery. Files live in R2 under the `gallery/` prefix;
+// each row holds the public URL of one uploaded image.
+
+export const galleryImage = pgTable("gallery_image", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  url: text("url").notNull(),
+  alt: text("alt"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

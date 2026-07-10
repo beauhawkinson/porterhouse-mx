@@ -1,3 +1,5 @@
+import { useRouteContext } from "@tanstack/react-router";
+
 import { ProductCard } from "@/components/products/ProductCard";
 import { buttonVariants } from "@/components/ui/button";
 import AppLink from "@/components/ui/link";
@@ -20,21 +22,34 @@ const heroImage = (p: Product) => ({
 
 const label = (category: string) => CATEGORY_LABELS[category as Category] ?? category;
 
-export function FeaturedShowcase({
-  products,
-  preview = false,
-}: {
-  products: FeaturedProducts;
-  /** Layout-only preview (fake products) — render fully non-interactive. */
-  preview?: boolean;
-}) {
-  if (products.length === 0) return null;
+export function FeaturedShowcase({ products }: { products: FeaturedProducts }) {
+  if (products.length === 0) return <EmptyFeatured />;
 
-  const content = <Spotlight products={products} />;
+  return <Spotlight products={products} />;
+}
 
-  // Preview products aren't in the DB, so navigating to them would 404. Disable
-  // all interaction so the section reads as a pure layout demo.
-  return preview ? <div className="pointer-events-none select-none">{content}</div> : content;
+// ── Empty state — keeps the front page from collapsing before any products ───
+
+function EmptyFeatured() {
+  const { isAdmin } = useRouteContext({ from: "__root__" });
+
+  return (
+    <section className="mx-auto mb-32 flex min-h-[55vh] max-w-6xl flex-col items-center justify-center px-4 text-center sm:px-6">
+      <div className="flex items-center gap-4">
+        <span aria-hidden className="h-10 w-1.5 shrink-0 bg-primary" />
+        <h2 className="font-moto_is_life text-5xl leading-none sm:text-7xl">Featured</h2>
+      </div>
+      <p className="mt-6 font-heading text-muted-foreground text-sm uppercase tracking-[0.3em]">
+        New drops coming soon
+      </p>
+
+      {isAdmin && (
+        <AppLink to="/admin/products/new" size="md" className="mt-8">
+          Create product
+        </AppLink>
+      )}
+    </section>
+  );
 }
 
 // ── Gate number plate — starting-gate motif shared across the featured tiles ──

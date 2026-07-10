@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
@@ -21,6 +22,7 @@ import { Route as OrdersSuccessRouteImport } from './routes/orders/success'
 import { Route as LegalTermsRouteImport } from './routes/legal/terms'
 import { Route as LegalShippingReturnsRouteImport } from './routes/legal/shipping-returns'
 import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
+import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/index'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
@@ -37,6 +39,11 @@ const SignInRoute = SignInRouteImport.update({
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -89,6 +96,11 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminGalleryRoute = AdminGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -130,8 +142,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/gallery': typeof GalleryRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/shipping-returns': typeof LegalShippingReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -150,8 +164,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/gallery': typeof GalleryRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/shipping-returns': typeof LegalShippingReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -172,8 +188,10 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
+  '/gallery': typeof GalleryRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/admin/gallery': typeof AdminGalleryRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/shipping-returns': typeof LegalShippingReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
@@ -195,8 +213,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/account'
     | '/cart'
+    | '/gallery'
     | '/shop'
     | '/sign-in'
+    | '/admin/gallery'
     | '/legal/privacy'
     | '/legal/shipping-returns'
     | '/legal/terms'
@@ -215,8 +235,10 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/cart'
+    | '/gallery'
     | '/shop'
     | '/sign-in'
+    | '/admin/gallery'
     | '/legal/privacy'
     | '/legal/shipping-returns'
     | '/legal/terms'
@@ -236,8 +258,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/account'
     | '/cart'
+    | '/gallery'
     | '/shop'
     | '/sign-in'
+    | '/admin/gallery'
     | '/legal/privacy'
     | '/legal/shipping-returns'
     | '/legal/terms'
@@ -258,6 +282,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AccountRoute: typeof AccountRoute
   CartRoute: typeof CartRoute
+  GalleryRoute: typeof GalleryRoute
   ShopRoute: typeof ShopRoute
   SignInRoute: typeof SignInRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
@@ -283,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -355,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/gallery': {
+      id: '/admin/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminGalleryRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/products/': {
       id: '/admin/products/'
       path: '/products'
@@ -408,6 +447,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminGalleryRoute: typeof AdminGalleryRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrdersOrderIdRoute: typeof AdminOrdersOrderIdRoute
   AdminProductsProductIdRoute: typeof AdminProductsProductIdRoute
@@ -417,6 +457,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminGalleryRoute: AdminGalleryRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrdersOrderIdRoute: AdminOrdersOrderIdRoute,
   AdminProductsProductIdRoute: AdminProductsProductIdRoute,
@@ -434,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AccountRoute: AccountRoute,
   CartRoute: CartRoute,
+  GalleryRoute: GalleryRoute,
   ShopRoute: ShopRoute,
   SignInRoute: SignInRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,

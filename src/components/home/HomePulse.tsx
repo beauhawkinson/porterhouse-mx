@@ -1,5 +1,3 @@
-import { ChevronDown } from "lucide-react";
-
 import Link from "@/components/ui/link";
 import { app } from "@/lib/config/app.config";
 import { FeaturedShowcase } from "./FeaturedShowcase";
@@ -7,7 +5,9 @@ import { ProductRequest } from "./ProductRequest";
 
 import type { FeaturedProducts } from "./shared";
 
-export function HomePulse({ products, preview }: { products: FeaturedProducts; preview: boolean }) {
+const hoodie = (file: string) => `/images/products/moto-is-life-hoodie/${file}`;
+
+export function HomePulse({ products }: { products: FeaturedProducts }) {
   return (
     <div>
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -32,15 +32,29 @@ export function HomePulse({ products, preview }: { products: FeaturedProducts; p
             </Link>
           </div>
         </div>
-
-        {/* Subtle scroll cue hinting there's more below the fold */}
-        <ChevronDown
-          aria-hidden
-          className="absolute bottom-8 left-1/2 z-10 h-6 w-6 -translate-x-1/2 animate-scroll-cue text-secondary-foreground"
-        />
       </section>
 
-      <FeaturedShowcase products={products} preview={preview} />
+      {/* Rider cards — peek up from below the fold as a scroll cue */}
+      <section className="relative z-20 -mt-20 mb-32 flex flex-col items-center justify-center gap-6 overflow-x-clip px-6 sm:-mt-28 sm:flex-row sm:items-start sm:gap-20">
+        <div className="aspect-[3/4] w-full shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl sm:w-80 sm:-rotate-[5deg]">
+          <img
+            src={hoodie("action-1.jpeg")}
+            alt="Rider on the track in Moto Is Life gear"
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl sm:mt-12 sm:w-[30rem] sm:rotate-[5deg]">
+          <img
+            src={hoodie("action-2.jpeg")}
+            alt="Rider rounding the turn in Moto Is Life gear"
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      </section>
+
+      <FeaturedShowcase products={products} />
 
       <ProductRequest />
     </div>

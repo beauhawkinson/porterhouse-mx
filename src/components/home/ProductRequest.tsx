@@ -30,8 +30,8 @@ export function ProductRequest() {
   return (
     <section className="mx-auto mb-32 max-w-2xl px-6 text-center">
       <div className="flex items-center justify-center gap-4">
-        <span aria-hidden className="h-8 w-1.5 shrink-0 bg-primary" />
-        <h2 className="font-heading text-3xl text-foreground uppercase tracking-tight sm:text-4xl">
+        <span aria-hidden className="h-10 w-1.5 shrink-0 bg-primary" />
+        <h2 className="font-moto_is_life text-5xl text-foreground leading-none sm:text-6xl">
           Request a product
         </h2>
       </div>
@@ -62,9 +62,9 @@ export function ProductRequest() {
               required
               minLength={10}
               maxLength={1000}
-              rows={4}
+              rows={7}
               placeholder="e.g. A long-sleeve jersey in team blue, sizes up to XXL"
-              className="w-full resize-y rounded-lg border border-border bg-background px-4 py-3 text-foreground text-sm outline-none focus-visible:border-primary"
+              className="min-h-44 w-full resize-y rounded-lg border border-border bg-background px-4 py-3 text-foreground text-sm outline-none focus-visible:border-primary"
             />
             <div className="flex items-center justify-between gap-4">
               <span className="text-faded-foreground text-xs">{message.trim().length}/1000</span>
