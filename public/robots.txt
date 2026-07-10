@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /account
+Disallow: /cart
 
 Sitemap: https://motoislife.vercel.app/sitemap.xml

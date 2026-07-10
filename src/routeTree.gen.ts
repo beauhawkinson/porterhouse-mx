@@ -18,6 +18,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
 import { Route as OrdersSuccessRouteImport } from './routes/orders/success'
+import { Route as LegalTermsRouteImport } from './routes/legal/terms'
+import { Route as LegalShippingReturnsRouteImport } from './routes/legal/shipping-returns'
+import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/index'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
@@ -71,6 +74,21 @@ const OrdersSuccessRoute = OrdersSuccessRouteImport.update({
   path: '/orders/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalShippingReturnsRoute = LegalShippingReturnsRouteImport.update({
+  id: '/legal/shipping-returns',
+  path: '/legal/shipping-returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -114,6 +132,9 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/shipping-returns': typeof LegalShippingReturnsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/orders/success': typeof OrdersSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -131,6 +152,9 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/shipping-returns': typeof LegalShippingReturnsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/orders/success': typeof OrdersSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -150,6 +174,9 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
   '/sign-in': typeof SignInRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/shipping-returns': typeof LegalShippingReturnsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/orders/success': typeof OrdersSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -170,6 +197,9 @@ export interface FileRouteTypes {
     | '/cart'
     | '/shop'
     | '/sign-in'
+    | '/legal/privacy'
+    | '/legal/shipping-returns'
+    | '/legal/terms'
     | '/orders/success'
     | '/products/$slug'
     | '/admin/'
@@ -187,6 +217,9 @@ export interface FileRouteTypes {
     | '/cart'
     | '/shop'
     | '/sign-in'
+    | '/legal/privacy'
+    | '/legal/shipping-returns'
+    | '/legal/terms'
     | '/orders/success'
     | '/products/$slug'
     | '/admin'
@@ -205,6 +238,9 @@ export interface FileRouteTypes {
     | '/cart'
     | '/shop'
     | '/sign-in'
+    | '/legal/privacy'
+    | '/legal/shipping-returns'
+    | '/legal/terms'
     | '/orders/success'
     | '/products/$slug'
     | '/admin/'
@@ -224,6 +260,9 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   ShopRoute: typeof ShopRoute
   SignInRoute: typeof SignInRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalShippingReturnsRoute: typeof LegalShippingReturnsRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   OrdersSuccessRoute: typeof OrdersSuccessRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -293,6 +332,27 @@ declare module '@tanstack/react-router' {
       path: '/orders/success'
       fullPath: '/orders/success'
       preLoaderRoute: typeof OrdersSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/shipping-returns': {
+      id: '/legal/shipping-returns'
+      path: '/legal/shipping-returns'
+      fullPath: '/legal/shipping-returns'
+      preLoaderRoute: typeof LegalShippingReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/products/': {
@@ -376,6 +436,9 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   ShopRoute: ShopRoute,
   SignInRoute: SignInRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalShippingReturnsRoute: LegalShippingReturnsRoute,
+  LegalTermsRoute: LegalTermsRoute,
   OrdersSuccessRoute: OrdersSuccessRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

@@ -136,11 +136,11 @@ function ProductDetailPage() {
         aria-label="Breadcrumb"
         className="mb-8 flex items-center gap-2 text-faded-foreground text-sm"
       >
-        <Link to="/" variant="breadcrumb" size="none">
+        <Link to="/" variant="unstyled" size="none" className="rounded-sm hover:text-primary">
           Home
         </Link>
         <span aria-hidden="true">/</span>
-        <Link to="/shop" variant="breadcrumb" size="none">
+        <Link to="/shop" variant="unstyled" size="none" className="rounded-sm hover:text-primary">
           Shop
         </Link>
         <span aria-hidden="true">/</span>

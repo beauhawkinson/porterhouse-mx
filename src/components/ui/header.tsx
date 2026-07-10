@@ -1,8 +1,7 @@
-import { useRouteContext } from "@tanstack/react-router";
+import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { PreviewSwitcher } from "@/components/home/PreviewSwitcher";
 import { Button } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -13,9 +12,19 @@ const Header = () => {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
   const { isAdmin, hasProducts } = useRouteContext({ from: "__root__" });
+  const navigate = useNavigate();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeMobile = () => setMobileOpen(false);
+
+  // Sign out, land on the home page, then refresh the root context (isSignedIn,
+  // isAdmin) so the header and any gated UI update immediately.
+  const handleSignOut = async () => {
+    await signOut();
+    await navigate({ to: "/" });
+    await router.invalidate();
+  };
 
   // Close the mobile menu on Escape and lock body scroll while it's open.
   // biome-ignore lint/correctness/useExhaustiveDependencies: Allow
@@ -78,7 +87,7 @@ const Header = () => {
                 Account
               </Link>
 
-              <Button onClick={() => signOut()} variant="nav" size="none">
+              <Button onClick={handleSignOut} variant="nav" size="none">
                 Logout
               </Button>
             </>
@@ -96,7 +105,7 @@ const Header = () => {
             onClick={closeMobile}
             variant="unstyled"
             size="none"
-            className="group relative justify-self-end text-foreground hover:text-primary"
+            className="group relative justify-self-end rounded-md border border-transparent text-foreground hover:text-primary focus-visible:border-primary"
             aria-label={`Cart${totalItems > 0 ? `, ${totalItems} item${totalItems === 1 ? "" : "s"}` : ""}`}
           >
             <ShoppingCart />
@@ -111,15 +120,6 @@ const Header = () => {
           <span aria-hidden className="justify-self-end" />
         )}
       </div>
-
-      {/* Admin-only design preview bar (temporary testing tool) */}
-      {isAdmin && (
-        <div className="flex items-center border-border border-t bg-muted/50">
-          <div className="mx-auto flex w-full max-w-7xl items-center px-4 sm:px-6">
-            <PreviewSwitcher />
-          </div>
-        </div>
-      )}
 
       {/* Mobile nav panel */}
       <div
@@ -149,7 +149,7 @@ const Header = () => {
               <Button
                 onClick={() => {
                   closeMobile();
-                  signOut();
+                  handleSignOut();
                 }}
                 variant="nav-mobile"
                 size="none"

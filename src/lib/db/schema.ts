@@ -192,3 +192,27 @@ export const orderItem = pgTable("order_item", {
   priceCentsSnapshot: integer("price_cents_snapshot").notNull(),
   quantity: integer("quantity").notNull(),
 });
+
+// ─── Product requests ──────────────────────────────────────────────────────────
+// Signed-in customers can suggest products they'd like to see.
+
+export const productRequestStatusEnum = pgEnum("product_request_status", [
+  "open",
+  "reviewed",
+  "closed",
+]);
+
+export const PRODUCT_REQUEST_STATUS_VALUES = productRequestStatusEnum.enumValues;
+export type ProductRequestStatus = (typeof PRODUCT_REQUEST_STATUS_VALUES)[number];
+
+export const productRequest = pgTable("product_request", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // Email snapshot at submission time (the account email may change later).
+  email: text("email"),
+  message: text("message").notNull(),
+  status: productRequestStatusEnum("status").notNull().default("open"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

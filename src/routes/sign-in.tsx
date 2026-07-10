@@ -41,7 +41,14 @@ function SignInPage() {
 
           <p className="mt-6 text-center text-faded-foreground text-xs">
             By signing in, you agree to our{" "}
-            <span className="cursor-pointer underline underline-offset-4">terms of service</span>.
+            <Link to="/legal/terms" variant="inline" size="none">
+              terms of service
+            </Link>{" "}
+            and{" "}
+            <Link to="/legal/privacy" variant="inline" size="none">
+              privacy policy
+            </Link>
+            .
           </p>
         </div>
 

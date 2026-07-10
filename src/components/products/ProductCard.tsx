@@ -39,13 +39,13 @@ export function ProductCard({
   const categoryLabel = CATEGORY_LABELS[category as Category] ?? category;
 
   return (
-    <article aria-label={`${name}, ${price}`} className="group/card flex flex-col">
+    <article aria-label={`${name}, ${price}`} className="group/card flex flex-col bg-background">
       {/* Image — primary visual */}
       <Link
         to="/products/$slug"
         params={{ slug }}
         aria-label={`View details for ${name}`}
-        className="relative block overflow-hidden bg-[#f5f0eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="relative block overflow-hidden bg-background focus-visible:border focus-visible:border-primary focus-visible:outline-none"
       >
         <div className="relative aspect-square overflow-hidden">
           <img
@@ -80,15 +80,13 @@ export function ProductCard({
             return (
               <Button
                 key={image.url}
-                variant="unstyled"
+                variant="outline"
                 size="none"
                 onClick={() => setSelected(image)}
                 aria-label={image.alt ?? `View image ${idx + 1} of ${name}`}
                 aria-pressed={isSelected}
                 className={`relative aspect-square w-14 overflow-hidden ${
-                  isSelected
-                    ? "ring-1 ring-primary ring-offset-2 ring-offset-background"
-                    : "opacity-70 hover:opacity-100"
+                  isSelected ? "" : "opacity-70 hover:opacity-100"
                 }`}
               >
                 <img
@@ -108,7 +106,7 @@ export function ProductCard({
       <Link
         to="/products/$slug"
         params={{ slug }}
-        className="mt-4 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="mt-4 block border border-transparent focus-visible:border focus-visible:border-primary focus-visible:outline-none"
       >
         <p className="font-medium text-[10px] text-muted-foreground tracking-[0.18em]">
           {categoryLabel}

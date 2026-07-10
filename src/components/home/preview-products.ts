@@ -1,6 +1,6 @@
 // ⚠️ TEMPORARY — design-preview data only.
 //
-// These mirror the seed catalog so Jeremy can view the featured-section layouts
+// These mirror the seed catalog so the owner can view the featured-section layouts
 // on prod without seeding real (Stripe-linked) products. The home page falls
 // back to these ONLY when the database has no products, so they vanish
 // automatically once a real product is created. Not wired to Stripe; the

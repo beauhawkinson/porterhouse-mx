@@ -222,8 +222,9 @@ function AdminOrdersPage() {
                     <Link
                       to="/admin/orders/$orderId"
                       params={{ orderId: o.id }}
-                      variant="data"
+                      variant="unstyled"
                       size="none"
+                      className="rounded-sm text-foreground underline underline-offset-4 decoration-border hover:text-primary hover:decoration-primary"
                     >
                       {o.customerEmail ?? "—"}
                     </Link>
@@ -240,8 +241,9 @@ function AdminOrdersPage() {
                     <Link
                       to="/admin/orders/$orderId"
                       params={{ orderId: o.id }}
-                      variant="action"
+                      variant="unstyled"
                       size="none"
+                      className="rounded-sm font-heading text-primary text-xs underline underline-offset-4 hover:text-primary/80"
                     >
                       View
                     </Link>
