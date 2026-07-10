@@ -74,37 +74,18 @@ body {
 @keyframes home-rise {
   from {
     opacity: 0;
-    transform: translateY(1.25rem);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scroll-cue {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(0.35rem);
     opacity: 1;
   }
 }
 
 .animate-home-rise {
-  animation: home-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-scroll-cue {
-  animation: scroll-cue 2s ease-in-out infinite;
+  animation: home-rise 0.5s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-home-rise,
-  .animate-scroll-cue {
+  .animate-home-rise {
     animation: none;
   }
 }
