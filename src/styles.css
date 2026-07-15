@@ -29,8 +29,8 @@ body {
 
   --foreground: oklch(0.96 0.004 285);
   --secondary-foreground: oklch(0.86 0.005 285);
-  --muted-foreground: oklch(0.7 0.008 285);
-  --faded-foreground: oklch(0.56 0.008 285);
+  --muted-foreground: oklch(0.75 0.008 285);
+  --faded-foreground: oklch(0.62 0.008 285);
 
   /* Bronze accent, nudged lighter/warmer so it pops on dark; dark text sits on it. */
   --primary: oklch(0.66 0.105 64);
@@ -77,6 +77,10 @@ body {
   textarea,
   [contenteditable="true"] {
     @apply select-text;
+  }
+  /* No image is draggable anywhere (no ghost-drag on the logo, products, etc.). */
+  img {
+    -webkit-user-drag: none;
   }
 }
 

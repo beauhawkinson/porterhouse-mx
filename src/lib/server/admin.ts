@@ -108,6 +108,26 @@ export const updateFulfillmentFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin(getRequest());
 
+    // Enforce the one-way state machine (unfulfilled → fulfilled → shipped, with
+    // revert as the only way back) on the server too, so it can't be bypassed.
+    const existing = await db.query.order.findFirst({ where: eq(order.id, data.orderId) });
+    if (!existing) throw new Error("Order not found.");
+
+    const from = existing.fulfillmentStatus;
+    const to = data.fulfillmentStatus;
+
+    if (existing.status === "refunded" && to !== "unfulfilled") {
+      throw new Error("A refunded order can't be marked fulfilled or shipped.");
+    }
+
+    const allowed =
+      (to === "fulfilled" && from === "unfulfilled") || // advance
+      (to === "shipped" && from !== "shipped") || // advance (can't re-ship)
+      (to === "unfulfilled" && from !== "unfulfilled"); // revert
+    if (!allowed) {
+      throw new Error(`Can't change fulfillment from "${from}" to "${to}".`);
+    }
+
     const now = new Date();
 
     type FulfillmentUpdate = {

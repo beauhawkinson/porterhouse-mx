@@ -28,7 +28,7 @@ export function ProductRequest() {
   };
 
   return (
-    <section className="mx-auto mb-32 max-w-2xl px-6 text-center">
+    <section className="mx-auto mb-40 max-w-2xl px-6 text-center">
       <div className="flex items-center justify-center gap-4">
         <span aria-hidden className="h-10 w-1.5 shrink-0 bg-primary" />
         <h2 className="font-moto_is_life text-5xl text-foreground leading-none sm:text-6xl">

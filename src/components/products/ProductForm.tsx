@@ -156,7 +156,7 @@ export function ProductForm({
           onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
           rows={3}
           placeholder="Short description shown on the product page."
-          className="w-full border border-border bg-background px-3 py-2 text-foreground text-sm placeholder:text-faded-foreground focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground text-sm outline-none placeholder:text-faded-foreground focus-visible:border-primary"
         />
       </Field>
 
@@ -170,7 +170,7 @@ export function ProductForm({
           onChange={(e) => setForm((p) => ({ ...p, details: e.target.value }))}
           rows={5}
           placeholder="Heavyweight cotton blend fleece&#10;Front kangaroo pocket&#10;..."
-          className="w-full border border-border bg-background px-3 py-2 text-foreground text-sm placeholder:text-faded-foreground focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground text-sm outline-none placeholder:text-faded-foreground focus-visible:border-primary"
         />
       </Field>
 

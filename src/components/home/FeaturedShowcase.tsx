@@ -34,7 +34,7 @@ function EmptyFeatured() {
   const { isAdmin } = useRouteContext({ from: "__root__" });
 
   return (
-    <section className="mx-auto mb-32 flex min-h-[55vh] max-w-6xl flex-col items-center justify-center px-4 text-center sm:px-6">
+    <section className="mx-auto mb-40 flex min-h-[55vh] max-w-6xl flex-col items-center justify-center px-4 pt-24 text-center sm:px-6 sm:pt-32">
       <div className="flex items-center gap-4">
         <span aria-hidden className="h-10 w-1.5 shrink-0 bg-primary" />
         <h2 className="font-moto_is_life text-5xl leading-none sm:text-7xl">Featured</h2>
@@ -73,7 +73,7 @@ function Spotlight({ products }: { products: FeaturedProducts }) {
   const soldOut = !hasStock(hero);
 
   return (
-    <section className="mx-auto mb-32 max-w-6xl px-4 sm:px-6">
+    <section className="mx-auto mb-40 max-w-6xl px-4 pt-24 sm:px-6 sm:pt-32">
       <div className="mb-12 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <span aria-hidden className="h-10 w-1.5 shrink-0 bg-primary" />
@@ -125,7 +125,7 @@ function Spotlight({ products }: { products: FeaturedProducts }) {
 
       {/* Remaining products — lined up on the gate */}
       {rest.length > 0 && (
-        <div className="mt-20 grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3">
+        <div className="mt-24 grid grid-cols-2 gap-x-8 gap-y-12 sm:mt-28 sm:grid-cols-3">
           {rest.map((p, i) => (
             <div key={p.id} className="relative">
               <GatePlate n={i + 2} />

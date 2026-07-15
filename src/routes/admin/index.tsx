@@ -34,6 +34,13 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-8">
+      <div className="mb-6">
+        <h2 className="font-heading text-foreground text-xl uppercase tracking-wider">Dashboard</h2>
+        <p className="mt-1 text-muted-foreground text-sm">
+          Revenue, fulfillment, and recent orders at a glance.
+        </p>
+      </div>
+
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div>

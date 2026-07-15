@@ -453,22 +453,39 @@ function OrderDetailPage() {
         )}
       </InfoCard>
 
-      {/* Fulfillment actions */}
+      {/* Fulfillment actions — one-way state machine: unfulfilled → fulfilled →
+          shipped, with Revert as the only way back. You can't re-run a step
+          you're already past. */}
       <InfoCard title="Fulfillment">
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
             variant="secondary"
-            disabled={saving || order.fulfillmentStatus === "fulfilled"}
+            disabled={saving || isRefunded || order.fulfillmentStatus !== "unfulfilled"}
+            title={
+              isRefunded
+                ? "Order is refunded"
+                : order.fulfillmentStatus === "fulfilled"
+                  ? "Already fulfilled"
+                  : order.fulfillmentStatus === "shipped"
+                    ? "Order has shipped — revert first to change"
+                    : undefined
+            }
             onClick={() => handleFulfillment("fulfilled")}
           >
             {saving ? "Saving…" : "Mark fulfilled"}
           </Button>
           <Button
             size="sm"
-            disabled={saving || isRefunded}
+            disabled={saving || isRefunded || order.fulfillmentStatus === "shipped"}
+            title={
+              isRefunded
+                ? "Order is refunded — do not ship"
+                : order.fulfillmentStatus === "shipped"
+                  ? "Already shipped"
+                  : undefined
+            }
             onClick={() => setShowShipModal(true)}
-            title={isRefunded ? "Order is refunded — do not ship" : undefined}
           >
             Mark shipped
           </Button>
@@ -476,6 +493,9 @@ function OrderDetailPage() {
             size="sm"
             variant="ghost"
             disabled={saving || order.fulfillmentStatus === "unfulfilled"}
+            title={
+              order.fulfillmentStatus === "unfulfilled" ? "Order is already unfulfilled" : undefined
+            }
             onClick={() => setShowRevertConfirm(true)}
           >
             Revert to unfulfilled
@@ -498,7 +518,7 @@ function OrderDetailPage() {
           onBlur={handleNotesSave}
           rows={4}
           placeholder="Private notes for the owner…"
-          className="w-full border border-border bg-background px-3 py-2 text-foreground text-sm placeholder:text-faded-foreground focus:border-primary focus:outline-none focus:ring focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground text-sm outline-none placeholder:text-faded-foreground focus-visible:border-primary"
         />
       </InfoCard>
     </div>

@@ -65,7 +65,7 @@ function AdminProductsPage() {
           <p className="font-heading text-xl">NO PRODUCTS</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-border">
+        <div className="overflow-hidden rounded-lg border border-border">
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>

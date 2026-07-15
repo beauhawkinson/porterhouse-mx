@@ -1,7 +1,8 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import { Check, ChevronDown, Copy } from "lucide-react";
 import { Fragment, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { signOut } from "@/lib/auth-client";
 import { getMyOrdersFn } from "@/lib/server/account";
 
 export const Route = createFileRoute("/account")({
@@ -53,7 +55,16 @@ function formatCents(cents: number | null) {
 function AccountPage() {
   const { user, orders } = Route.useLoaderData();
   const { hasProducts } = useRouteContext({ from: "__root__" });
+  const navigate = useNavigate();
+  const router = useRouter();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  // Sign out, land on home, then refresh root context so the header updates.
+  const handleSignOut = async () => {
+    await signOut();
+    await navigate({ to: "/" });
+    await router.invalidate();
+  };
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
@@ -78,22 +89,28 @@ function AccountPage() {
       </div>
 
       {/* Profile card */}
-      <div className="mb-10 flex items-center gap-4 p-6">
-        {user.image ? (
-          <img
-            src={user.image}
-            alt={user.name ?? "Profile"}
-            className="h-13 w-13 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted font-heading text-foreground text-xl">
-            {(user.name ?? user.email ?? "?")[0]?.toUpperCase()}
+      <div className="mb-10 flex items-center justify-between gap-4 p-6">
+        <div className="flex items-center gap-4">
+          {user.image ? (
+            <img
+              src={user.image}
+              alt={user.name ?? "Profile"}
+              className="h-13 w-13 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted font-heading text-foreground text-xl">
+              {(user.name ?? user.email ?? "?")[0]?.toUpperCase()}
+            </div>
+          )}
+          <div>
+            {user.name && <p className="font-heading text-foreground text-lg">{user.name}</p>}
+            <p className="text-muted-foreground text-sm">{user.email}</p>
           </div>
-        )}
-        <div>
-          {user.name && <p className="font-heading text-foreground text-lg">{user.name}</p>}
-          <p className="text-muted-foreground text-sm">{user.email}</p>
         </div>
+
+        <Button variant="outline" size="sm" onClick={handleSignOut} className="shrink-0">
+          Log out
+        </Button>
       </div>
 
       {/* Orders section */}

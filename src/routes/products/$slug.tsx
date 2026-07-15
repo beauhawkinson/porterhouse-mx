@@ -226,15 +226,22 @@ function ProductDetailPage() {
             </p>
           )}
 
-          {/* Add to cart */}
-          <Button
-            size="lg"
-            onClick={handleAddToCart}
-            disabled={!canAdd}
-            className={["mt-2", !variantLess && !selectedVariantId ? "opacity-60" : ""].join(" ")}
-          >
-            {buttonLabel}
-          </Button>
+          {/* Add to cart — with a quick "View cart" shortcut once something's in it */}
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <Button
+              size="lg"
+              onClick={handleAddToCart}
+              disabled={!canAdd}
+              className={!variantLess && !selectedVariantId ? "opacity-60" : ""}
+            >
+              {buttonLabel}
+            </Button>
+            {cartItems.length > 0 && (
+              <Link to="/cart" variant="outline" size="lg">
+                View cart
+              </Link>
+            )}
+          </div>
 
           {/* Details */}
           {product.details && (

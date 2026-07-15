@@ -90,6 +90,13 @@ function AdminOrdersPage() {
 
   return (
     <div className="space-y-4">
+      <div className="mb-6">
+        <h2 className="font-heading text-foreground text-xl uppercase tracking-wider">Orders</h2>
+        <p className="mt-1 text-muted-foreground text-sm">
+          View, fulfill, and refund customer orders.
+        </p>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">

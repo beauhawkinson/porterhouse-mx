@@ -1,10 +1,10 @@
-import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { useRouteContext } from "@tanstack/react-router";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import Link from "@/components/ui/link";
-import { signOut, useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/cart/store";
 import { app } from "@/lib/config/app.config";
 
@@ -12,19 +12,9 @@ const Header = () => {
   const totalItems = useCartStore((s) => s.totalItems());
   const { data: session } = useSession();
   const { isAdmin, hasProducts } = useRouteContext({ from: "__root__" });
-  const navigate = useNavigate();
-  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeMobile = () => setMobileOpen(false);
-
-  // Sign out, land on the home page, then refresh the root context (isSignedIn,
-  // isAdmin) so the header and any gated UI update immediately.
-  const handleSignOut = async () => {
-    await signOut();
-    await navigate({ to: "/" });
-    await router.invalidate();
-  };
 
   // Close the mobile menu on Escape and lock body scroll while it's open.
   // biome-ignore lint/correctness/useExhaustiveDependencies: Allow
@@ -47,41 +37,40 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border-border border-b bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[auto_1fr_auto] items-center px-4 sm:px-6 md:grid-cols-3 md:px-8">
-        {/* Left: hamburger (mobile) + logo */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-nav"
-            className="md:hidden"
-          >
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </Button>
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 md:grid-cols-3 md:px-8">
+        {/* Hamburger — mobile only, pinned left */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
+          className="col-start-1 justify-self-start md:hidden"
+        >
+          {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+        </Button>
 
-          <Link
-            to="/"
-            onClick={closeMobile}
-            variant="logo"
-            className="flex items-center gap-1.5 text-2xl!"
-          >
-            {/* Black-on-white source recolored in-place: invert → white mark on
-                black, then screen blend drops the black to transparent. */}
-            <img
-              src="/android-chrome-512x512.png"
-              alt=""
-              aria-hidden
-              className="h-7 w-7 shrink-0 mix-blend-screen invert"
-            />
-            <span className="mt-1">{app.brand.name}</span>
-          </Link>
-        </div>
+        {/* Logo + favicon — centered on mobile, left on desktop */}
+        <Link
+          to="/"
+          onClick={closeMobile}
+          variant="logo"
+          className="col-start-2 flex items-center gap-1.5 justify-self-center text-2xl! md:col-start-1 md:justify-self-start"
+        >
+          {/* Black-on-white source recolored in-place: invert → white mark on
+              black, then screen blend drops the black to transparent. */}
+          <img
+            src="/android-chrome-512x512.png"
+            alt=""
+            aria-hidden
+            className="h-7 w-7 shrink-0 mix-blend-screen invert"
+          />
+          <span className="mt-1">{app.brand.name}</span>
+        </Link>
 
         {/* Center: nav (desktop) */}
-        <nav className="hidden items-center justify-center gap-8 justify-self-center md:flex">
+        <nav className="hidden items-center justify-center gap-8 justify-self-center md:col-start-2 md:flex">
           {hasProducts && (
             <Link to="/shop" variant="nav" size="none">
               Shop
@@ -99,15 +88,9 @@ const Header = () => {
           )}
 
           {session ? (
-            <>
-              <Link to="/account" variant="nav" size="none">
-                Account
-              </Link>
-
-              <Button onClick={handleSignOut} variant="nav" size="none">
-                Logout
-              </Button>
-            </>
+            <Link to="/account" variant="nav" size="none">
+              Account
+            </Link>
           ) : (
             <Link to="/sign-in" variant="nav" size="none">
               Sign In
@@ -122,7 +105,7 @@ const Header = () => {
             onClick={closeMobile}
             variant="unstyled"
             size="none"
-            className="group relative justify-self-end rounded-md border border-transparent text-foreground hover:text-primary focus-visible:border-primary"
+            className="group relative col-start-3 justify-self-end rounded-md border border-transparent text-foreground hover:text-primary focus-visible:border-primary"
             aria-label={`Cart${totalItems > 0 ? `, ${totalItems} item${totalItems === 1 ? "" : "s"}` : ""}`}
           >
             <ShoppingCart />
@@ -134,7 +117,7 @@ const Header = () => {
           </Link>
         ) : (
           // Keep the grid's third column so the logo/nav stay centered.
-          <span aria-hidden className="justify-self-end" />
+          <span aria-hidden className="col-start-3 justify-self-end" />
         )}
       </div>
 
@@ -163,22 +146,9 @@ const Header = () => {
           )}
 
           {session ? (
-            <>
-              <Link to="/account" onClick={closeMobile} variant="nav-mobile" size="none">
-                Account
-              </Link>
-              <Button
-                onClick={() => {
-                  closeMobile();
-                  handleSignOut();
-                }}
-                variant="nav-mobile"
-                size="none"
-                className="text-left"
-              >
-                Logout
-              </Button>
-            </>
+            <Link to="/account" onClick={closeMobile} variant="nav-mobile" size="none">
+              Account
+            </Link>
           ) : (
             <Link to="/sign-in" onClick={closeMobile} variant="nav-mobile" size="none">
               Sign In
