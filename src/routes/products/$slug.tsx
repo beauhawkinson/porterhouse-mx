@@ -194,7 +194,7 @@ function ProductDetailPage() {
             <p className="font-semibold text-2xl text-foreground tabular-nums">{price}</p>
           </div>
 
-          <p className="mb-8 text-base text-secondary-foreground leading-relaxed">
+          <p className="mb-8 select-text text-base text-secondary-foreground leading-relaxed">
             {product.description}
           </p>
 
@@ -240,7 +240,7 @@ function ProductDetailPage() {
           {product.details && (
             <div className="mt-10 border-border border-t pt-8">
               <h3 className="mb-4 font-heading text-foreground text-sm tracking-wider">Details</h3>
-              <ul className="space-y-2 text-secondary-foreground text-sm">
+              <ul className="select-text space-y-2 text-secondary-foreground text-sm">
                 {product.details
                   .split("\n")
                   .filter(Boolean)

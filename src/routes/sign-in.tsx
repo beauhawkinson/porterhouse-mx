@@ -17,8 +17,8 @@ function SignInPage() {
   };
 
   return (
-    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-4">
-      <div className="relative z-10 w-full max-w-sm">
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-b from-muted via-background to-background px-4">
+      <div className="relative z-10 w-full max-w-sm animate-home-rise">
         <div className="mb-10 text-center">
           <Link to="/" variant="logo" size="none">
             {app.brand.name}

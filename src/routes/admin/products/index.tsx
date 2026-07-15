@@ -46,21 +46,28 @@ function AdminProductsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-heading text-foreground text-xl tracking-wider">Products</h2>
-        <Link to="/admin/products/new" size="sm">
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div>
+          <h2 className="font-heading text-foreground text-xl uppercase tracking-wider">
+            Products
+          </h2>
+          <p className="mt-1 text-muted-foreground text-sm">
+            Create and manage the products in your store.
+          </p>
+        </div>
+        <Link to="/admin/products/new" size="sm" className="shrink-0">
           New product
         </Link>
       </div>
 
       {products.length === 0 ? (
-        <div className="py-16 text-center text-[#999]">
+        <div className="py-16 text-center text-faded-foreground">
           <p className="font-heading text-xl">NO PRODUCTS</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-[#e5e0d8]">
+        <div className="rounded-lg border border-border">
           <Table>
-            <TableHeader className="bg-[#f5f0eb]">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead className="w-auto px-4 py-2" />
                 <TableHead>Name</TableHead>
@@ -80,7 +87,7 @@ function AdminProductsPage() {
 
                 return (
                   <>
-                    <TableRow key={p.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                    <TableRow key={p.id} className={i % 2 === 0 ? "bg-background" : "bg-muted/40"}>
                       <TableHead>
                         {p.imageUrl && (
                           <img
@@ -108,7 +115,7 @@ function AdminProductsPage() {
                               ? "text-red-600"
                               : p.totalStock < 5
                                 ? "text-amber-700"
-                                : "text-[#333]"
+                                : "text-secondary-foreground"
                           }
                         >
                           {p.totalStock}
@@ -131,16 +138,16 @@ function AdminProductsPage() {
                       </TableHead>
                     </TableRow>
                     {isExpanded && (
-                      <TableRow key={`${p.id}-variants`} className="bg-[#f5f0eb]">
+                      <TableRow key={`${p.id}-variants`} className="bg-muted">
                         <td colSpan={7} className="px-8 py-3">
                           <div className="flex flex-wrap gap-4">
                             {sortedVariants.map((v) => (
                               <div key={v.id} className="text-sm">
-                                <span className="font-heading text-[#666] text-xs tracking-wider">
+                                <span className="font-heading text-muted-foreground text-xs tracking-wider">
                                   {v.size}
                                 </span>
                                 <span
-                                  className={`ml-2 ${v.stock === 0 ? "text-red-600" : v.stock < 3 ? "text-amber-700" : "text-[#333]"}`}
+                                  className={`ml-2 ${v.stock === 0 ? "text-red-600" : v.stock < 3 ? "text-amber-700" : "text-secondary-foreground"}`}
                                 >
                                   {v.stock} in stock
                                 </span>

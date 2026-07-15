@@ -21,7 +21,7 @@ export function LegalPage({
       </h1>
       <p className="mt-2 text-faded-foreground text-sm">Last updated {updated}</p>
 
-      <div className="mt-10 space-y-8 text-secondary-foreground leading-relaxed [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_h2]:mb-2 [&_h2]:font-heading [&_h2]:text-foreground [&_h2]:text-lg [&_h2]:uppercase [&_h2]:tracking-wide [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5">
+      <div className="mt-10 select-text space-y-8 text-secondary-foreground leading-relaxed [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_h2]:mb-2 [&_h2]:font-heading [&_h2]:text-foreground [&_h2]:text-lg [&_h2]:uppercase [&_h2]:tracking-wide [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5">
         {children}
       </div>
     </div>

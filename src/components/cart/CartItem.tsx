@@ -23,7 +23,7 @@ export function CartItemRow({ item }: Props) {
 
   return (
     <div className="flex gap-4 border-border border-b py-5 last:border-0">
-      <div className="h-34 w-34 flex-shrink-0 overflow-hidden bg-[#f5f0eb]">
+      <div className="h-34 w-34 flex-shrink-0 overflow-hidden bg-muted">
         <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
       </div>
 

@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
 
+import { buttonVariants } from "@/components/ui/button";
 import { UPLOAD_ACCEPT, UPLOAD_MAX_SIZE } from "@/lib/products/upload-constants";
 import {
   deleteGalleryImageFn,
@@ -62,14 +63,14 @@ function AdminGalleryPage() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h2 className="font-heading text-foreground text-xl tracking-wider">GALLERY</h2>
+          <h2 className="font-heading text-foreground text-xl uppercase tracking-wider">Gallery</h2>
           <p className="mt-1 text-muted-foreground text-sm">
             Upload images to the gallery. JPEG, PNG, or WebP up to 5MB.
           </p>
         </div>
 
         <label
-          className={`shrink-0 cursor-pointer rounded-lg bg-foreground px-5 py-2.5 font-heading text-background text-sm shadow-sm hover:bg-foreground/80 ${
+          className={`${buttonVariants({ variant: "primary", size: "sm" })} shrink-0 cursor-pointer ${
             busy ? "pointer-events-none opacity-50" : ""
           }`}
         >

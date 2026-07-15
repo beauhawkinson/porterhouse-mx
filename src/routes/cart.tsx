@@ -63,8 +63,8 @@ function CartPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 py-32 text-center">
-        <h1 className="mb-4 font-heading text-4xl text-[#111]">YOUR CART IS EMPTY</h1>
-        <p className="mb-8 text-[#666]">Looks like you haven't added anything yet.</p>
+        <h1 className="mb-4 font-heading text-4xl text-foreground">YOUR CART IS EMPTY</h1>
+        <p className="mb-8 text-muted-foreground">Looks like you haven't added anything yet.</p>
         <Link to="/shop">Shop now</Link>
       </div>
     );
@@ -72,7 +72,7 @@ function CartPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="mb-10 font-heading text-4xl text-[#111]">Your Cart</h1>
+      <h1 className="mb-10 font-heading text-4xl text-foreground">Your Cart</h1>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
         {/* Line items */}
@@ -85,31 +85,31 @@ function CartPage() {
         {/* Order summary */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 border p-6">
-            <h2 className="mb-6 font-heading text-[#111] text-xl">Order Summary</h2>
+            <h2 className="mb-6 font-heading text-foreground text-xl">Order Summary</h2>
 
             <div className="mb-6 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-[#666]">Subtotal</span>
+                <span className="text-muted-foreground">Subtotal</span>
                 <span>{subtotal}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#666]">Shipping</span>
-                <span className="text-[#888]">
+                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-faded-foreground">
                   {shipping}
                   {app.shippingCents > 0 && " (USPS)"}
                 </span>
               </div>
-              <div className="flex justify-between text-[#999] text-xs">
+              <div className="flex justify-between text-faded-foreground text-xs">
                 <span>Taxes calculated at checkout</span>
               </div>
             </div>
 
-            <div className="mb-6 border-[#e5e0d8] border-t pt-4">
+            <div className="mb-6 border-border border-t pt-4">
               <div className="flex justify-between font-semibold text-base">
                 <span>Estimated Total</span>
                 <span>{subtotal}</span>
               </div>
-              <p className="mt-1 text-[#999] text-xs">
+              <p className="mt-1 text-faded-foreground text-xs">
                 {app.shippingCents > 0 ? `+ ${shipping} shipping + tax` : "+ tax"}
               </p>
             </div>
@@ -125,7 +125,7 @@ function CartPage() {
             </Button>
 
             {!session && (
-              <p className="mt-3 text-center text-[#999] text-xs">
+              <p className="mt-3 text-center text-faded-foreground text-xs">
                 <Link to="/sign-in" variant="inline" size="none">
                   Sign in
                 </Link>{" "}

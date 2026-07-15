@@ -28,8 +28,8 @@ function ShopPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       {/* Header */}
       <div className="relative mb-8">
-        <h1 className="mb-2 font-heading text-3xl text-[#111] sm:text-5xl">The Shop</h1>
-        <p className="text-[#666] text-base">
+        <h1 className="mb-2 font-heading text-3xl text-foreground sm:text-5xl">The Shop</h1>
+        <p className="text-base text-muted-foreground">
           {filtered.length} {filtered.length === 1 ? "product" : "products"}
           {category && ` in ${CATEGORY_LABELS_PLURAL[category]}`}
         </p>
@@ -51,7 +51,7 @@ function ShopPage() {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="py-24 text-center text-[#999]">
+        <div className="py-24 text-center text-faded-foreground">
           <p className="font-heading text-2xl">No Products Found</p>
         </div>
       ) : (

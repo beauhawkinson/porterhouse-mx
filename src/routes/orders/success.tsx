@@ -29,7 +29,7 @@ function SuccessPage() {
   if (!order) {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
-        <h1 className="font-heading text-3xl text-[#333]">ORDER NOT FOUND</h1>
+        <h1 className="font-heading text-3xl text-secondary-foreground">ORDER NOT FOUND</h1>
         <Link to="/shop" variant="inline" size="none" className="mt-6 inline-block">
           Continue shopping
         </Link>
@@ -43,37 +43,44 @@ function SuccessPage() {
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
       {/* Success header */}
       <div className="relative mb-12 text-center">
-        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#3E2A1E]">
-          <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary">
+          <svg
+            className="h-8 w-8 text-primary-foreground"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <title>Success</title>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="mb-2 font-heading text-4xl text-[#111]">ORDER CONFIRMED!</h1>
-        <p className="text-[#666]">You'll get a confirmation email from Stripe shortly.</p>
+        <h1 className="mb-2 font-heading text-4xl text-foreground">ORDER CONFIRMED!</h1>
+        <p className="text-muted-foreground">
+          You'll get a confirmation email from Stripe shortly.
+        </p>
       </div>
 
-      {/* Order details */}
-      <div className="mb-6 border border-[#e5e0d8] bg-white p-6">
+      {/* Order details — selectable so customers can copy their order # / details */}
+      <div className="mb-6 select-text border border-border bg-background p-6">
         <div className="mb-4 flex items-center gap-2">
-          <h2 className="font-heading text-[#111] text-lg">ORDER DETAILS</h2>
+          <h2 className="font-heading text-foreground text-lg">ORDER DETAILS</h2>
         </div>
 
         <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="mb-1 text-[#999] text-xs tracking-wider">Order ID</p>
-            <p className="break-all font-mono text-[#333] text-xs">{order.id}</p>
+            <p className="mb-1 text-faded-foreground text-xs tracking-wider">Order ID</p>
+            <p className="break-all font-mono text-secondary-foreground text-xs">{order.id}</p>
           </div>
           {order.customerEmail && (
             <div>
-              <p className="mb-1 text-[#999] text-xs tracking-wider">Email</p>
-              <p className="text-[#333]">{order.customerEmail}</p>
+              <p className="mb-1 text-faded-foreground text-xs tracking-wider">Email</p>
+              <p className="text-secondary-foreground">{order.customerEmail}</p>
             </div>
           )}
           {order.amountTotalCents !== null && (
             <div>
-              <p className="mb-1 text-[#999] text-xs tracking-wider">Total Paid</p>
-              <p className="font-semibold text-[#3E2A1E]">
+              <p className="mb-1 text-faded-foreground text-xs tracking-wider">Total Paid</p>
+              <p className="font-semibold text-primary">
                 {(order.amountTotalCents / 100).toLocaleString("en-US", {
                   style: "currency",
                   currency,
@@ -82,7 +89,7 @@ function SuccessPage() {
             </div>
           )}
           <div>
-            <p className="mb-1 text-[#999] text-xs tracking-wider">Status</p>
+            <p className="mb-1 text-faded-foreground text-xs tracking-wider">Status</p>
             <span className="inline-block bg-green-100 px-2 py-0.5 font-medium text-green-800 text-xs tracking-wider">
               {order.status}
             </span>
@@ -90,17 +97,19 @@ function SuccessPage() {
         </div>
 
         {/* Items */}
-        <div className="border-[#e5e0d8] border-t pt-4">
-          <p className="mb-3 font-heading text-[#333] text-sm tracking-wider">ITEMS</p>
+        <div className="border-border border-t pt-4">
+          <p className="mb-3 font-heading text-secondary-foreground text-sm tracking-wider">
+            ITEMS
+          </p>
           <ul className="space-y-3">
             {order.items.map((item) => (
               <li key={item.id} className="flex justify-between gap-4 text-sm">
-                <span className="min-w-0 text-[#333]">
+                <span className="min-w-0 text-secondary-foreground">
                   {item.nameSnapshot}
                   {item.sizeSnapshot && ` — Size ${item.sizeSnapshot}`}
                   {` × ${item.quantity}`}
                 </span>
-                <span className="shrink-0 font-medium text-[#111]">
+                <span className="shrink-0 font-medium text-foreground">
                   {((item.priceCentsSnapshot * item.quantity) / 100).toLocaleString("en-US", {
                     style: "currency",
                     currency,
@@ -113,9 +122,11 @@ function SuccessPage() {
 
         {/* Shipping address */}
         {order.shippingAddress && (
-          <div className="mt-4 border-[#e5e0d8] border-t pt-4">
-            <p className="mb-2 font-heading text-[#333] text-sm tracking-wider">SHIPS TO</p>
-            <address className="text-[#555] text-sm not-italic leading-relaxed">
+          <div className="mt-4 border-border border-t pt-4">
+            <p className="mb-2 font-heading text-secondary-foreground text-sm tracking-wider">
+              SHIPS TO
+            </p>
+            <address className="text-secondary-foreground text-sm not-italic leading-relaxed">
               {order.shippingName}
               <br />
               {order.shippingAddress.line1}
@@ -136,10 +147,10 @@ function SuccessPage() {
       </div>
 
       {/* TODO. Change this */}
-      <p className="mb-8 text-center text-[#666] text-sm">
+      <p className="mb-8 text-center text-muted-foreground text-sm">
         The owner will receive your order and ship it within 3–5 business days. You'll get a Stripe
         receipt via email. Reach out at{" "}
-        <a href={`mailto:${app.email}`} className="underline hover:text-[#6B4423]">
+        <a href={`mailto:${app.email}`} className="underline hover:text-primary">
           {app.email}
         </a>{" "}
         with any questions.

@@ -290,7 +290,7 @@ function OrderDetailPage() {
       <div className="flex items-start justify-between">
         <div>
           <FieldLabel>Order ID</FieldLabel>
-          <p className="break-all font-mono text-foreground text-sm">{order.id}</p>
+          <p className="select-text break-all font-mono text-foreground text-sm">{order.id}</p>
         </div>
         <div className="flex gap-2">
           <PaymentBadge status={order.status} />
@@ -298,7 +298,7 @@ function OrderDetailPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid select-text gap-6 md:grid-cols-2">
         {/* Customer */}
         <InfoCard title="Customer">
           <div className="space-y-2 text-sm">

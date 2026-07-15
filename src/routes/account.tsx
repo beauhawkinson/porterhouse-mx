@@ -144,7 +144,7 @@ function AccountPage() {
                           />
                         </button>
                       </TableCell>
-                      <TableCell className="font-mono text-secondary-foreground text-xs tracking-wider">
+                      <TableCell className="select-text font-mono text-secondary-foreground text-xs tracking-wider">
                         #{o.id.slice(0, 8).toUpperCase()}
                       </TableCell>
                       <TableCell>{formatDate(o.createdAt)}</TableCell>
@@ -169,7 +169,7 @@ function AccountPage() {
 
                     {isOpen && (
                       <TableRow className={rowBg}>
-                        <TableCell colSpan={COLUMN_COUNT} className="p-0">
+                        <TableCell colSpan={COLUMN_COUNT} className="select-text p-0">
                           <div className="px-6 py-5">
                             <div className="grid grid-cols-1 gap-6">
                               {/* Items */}

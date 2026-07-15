@@ -33,10 +33,10 @@ const buttonVariants = cva(
         muted:
           "rounded-sm text-faded-foreground text-xs underline underline-offset-4 hover:text-foreground border border-transparent focus-visible:border-primary",
         // Nav (header + admin sub-nav)
-        nav: "rounded-sm font-heading text-secondary-foreground text-sm hover:text-primary [&.active]:text-foreground [&.active]:underline [&.active]:underline-offset-4 border border-transparent focus-visible:border-primary",
+        nav: "rounded-sm font-heading text-secondary-foreground text-sm hover:text-primary [&.active]:text-primary [&.active]:underline [&.active]:underline-offset-4 border border-transparent focus-visible:border-primary",
         // Mobile menu rows — full-width, bigger touch target
         "nav-mobile":
-          "rounded-sm block w-full py-3 font-heading text-foreground text-base hover:text-primary [&.active]:text-primary border border-transparent focus-visible:border-primary",
+          "rounded-sm block w-full py-3 font-heading text-foreground text-base hover:text-primary [&.active]:text-primary [&.active]:underline [&.active]:underline-offset-4 border border-transparent focus-visible:border-primary",
         // Logo / brand wordmark
         logo: "rounded-sm font-moto_is_life text-foreground text-xl tracking-widest hover:text-primary border border-transparent focus-visible:border-primary",
         destructive:

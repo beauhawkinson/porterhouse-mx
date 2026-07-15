@@ -49,21 +49,34 @@ const Header = () => {
     <header className="fixed top-0 right-0 left-0 z-50 border-border border-b bg-background/80 backdrop-blur-xl">
       <div className="mx-auto grid h-16 max-w-7xl grid-cols-[auto_1fr_auto] items-center px-4 sm:px-6 md:grid-cols-3 md:px-8">
         {/* Left: hamburger (mobile) + logo */}
-        <div className="flex items-center gap-2 justify-self-start">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="icon-md"
+            size="icon-sm"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
-            className="-ml-2 md:hidden"
+            className="md:hidden"
           >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </Button>
 
-          <Link to="/" onClick={closeMobile} variant="logo" size="none">
-            {app.brand.name}
+          <Link
+            to="/"
+            onClick={closeMobile}
+            variant="logo"
+            className="flex items-center gap-1.5 text-2xl!"
+          >
+            {/* Black-on-white source recolored in-place: invert → white mark on
+                black, then screen blend drops the black to transparent. */}
+            <img
+              src="/android-chrome-512x512.png"
+              alt=""
+              aria-hidden
+              className="h-7 w-7 shrink-0 mix-blend-screen invert"
+            />
+            <span className="mt-1">{app.brand.name}</span>
           </Link>
         </div>
 

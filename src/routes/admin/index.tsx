@@ -37,19 +37,19 @@ function AdminDashboard() {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div>
-          <p className="mb-1 text-[#999] text-xs tracking-wider">Total Revenue</p>
+          <p className="mb-1 text-faded-foreground text-xs tracking-wider">Total Revenue</p>
           <p className="font-heading text-xs">{formatCents(totalRevenueCents)}</p>
         </div>
         <div>
-          <p className="mb-1 text-[#999] text-xs tracking-wider">Unfulfilled</p>
+          <p className="mb-1 text-faded-foreground text-xs tracking-wider">Unfulfilled</p>
           <p className="font-heading text-xs">{String(fulfillmentCounts.unfulfilled)}</p>
         </div>
         <div>
-          <p className="mb-1 text-[#999] text-xs tracking-wider">Fulfilled</p>
+          <p className="mb-1 text-faded-foreground text-xs tracking-wider">Fulfilled</p>
           <p className="font-heading text-xs">{String(fulfillmentCounts.fulfilled)}</p>
         </div>
         <div>
-          <p className="mb-1 text-[#999] text-xs tracking-wider">Shipped</p>
+          <p className="mb-1 text-faded-foreground text-xs tracking-wider">Shipped</p>
           <p className="font-heading text-xs">{String(fulfillmentCounts.shipped)}</p>
         </div>
       </div>
@@ -57,21 +57,18 @@ function AdminDashboard() {
       {/* Recent orders */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-heading text-[#333] tracking-wider">Recent Orders</h2>
-          <Link
-            to="/admin/orders"
-            className="text-[#6B4423] text-sm underline hover:text-[#3E2A1E]"
-          >
+          <h2 className="font-heading text-secondary-foreground tracking-wider">Recent Orders</h2>
+          <Link to="/admin/orders" className="text-primary text-sm underline hover:text-primary/80">
             View all
           </Link>
         </div>
         {/*  AdminDashboard.tsx */}
         {recentOrders.length === 0 ? (
-          <p className="py-8 text-center text-[#999]">No orders yet.</p>
+          <p className="py-8 text-center text-faded-foreground">No orders yet.</p>
         ) : (
           <div className="overflow-hidden rounded-lg border">
             <Table>
-              <TableHeader className="bg-[#f5f0eb]">
+              <TableHeader className="bg-muted">
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Customer</TableHead>
@@ -82,7 +79,7 @@ function AdminDashboard() {
               </TableHeader>
               <TableBody>
                 {recentOrders.map((o, i) => (
-                  <TableRow key={o.id} className={i % 2 === 0 ? "bg-white" : "bg-[#faf8f5]"}>
+                  <TableRow key={o.id} className={i % 2 === 0 ? "bg-background" : "bg-muted/40"}>
                     <TableCell>{formatDate(o.createdAt)}</TableCell>
                     <TableCell>
                       <Link
